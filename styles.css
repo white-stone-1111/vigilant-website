@@ -1,0 +1,554 @@
+/* ============================================================
+   Endors.io | Waitlist — recreation
+   Design tokens extracted from the original site
+   ============================================================ */
+
+:root {
+  --clear-gray: #d4d4d4;          /* primary text */
+  --white: #ffffff;
+  --dark: #212121;                /* input bg / button text */
+  --input-border: #404040;
+  --focus-blue: #0099ff;
+  --badge-fill: rgba(255, 255, 255, 0.1);
+  --link-faint: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: "Inter", "Inter Placeholder", sans-serif;
+  background: #000;
+  color: var(--clear-gray);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------- Background shader ---------------- */
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 1;
+}
+
+#bg-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* CSS fallback if WebGL2 is unavailable (the component's own fallback) */
+.background.no-webgl {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.32), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(0, 80, 166, 0.5), transparent 45%),
+    rgb(10, 10, 10);
+}
+
+/* ---------------- Iridescent star ---------------- */
+
+.star {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  mix-blend-mode: color-dodge;
+  opacity: 0.7;
+  z-index: 3;
+  overflow: visible;
+}
+
+.star-inner {
+  width: 602px;
+  aspect-ratio: 0.84686;
+  mix-blend-mode: color-burn;
+  opacity: 0.98;
+  filter: blur(0.5px);
+  position: relative;
+  flex: none;
+  overflow: visible;
+}
+
+.star-img-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.star-img-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ---------------- Page layout ---------------- */
+
+.page {
+  position: relative;
+  z-index: 4;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+/* "coming soon" badge */
+.badge {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 14px;
+  background: var(--badge-fill);
+  border: 1px solid var(--badge-fill);
+  border-radius: 50px;
+  width: min-content;
+}
+
+.badge .coming {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.3em;
+  white-space: pre;
+  font-feature-settings: "blwf" on, "cv09" on, "cv03" on, "cv04" on, "cv11" on;
+}
+
+.badge .soon {
+  color: var(--white);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.07em;
+  line-height: 1.1em;
+  white-space: pre;
+}
+
+/* Headline */
+.slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min-content;
+}
+
+.headline {
+  width: 480px;
+  color: var(--clear-gray);
+  font-size: 62px;
+  font-weight: 600;
+  letter-spacing: -0.07em;
+  line-height: 0.9em;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Content block: body, form, socials */
+.content {
+  max-width: 400px;
+  width: min-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 19px;
+}
+
+.body-text {
+  color: var(--clear-gray);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 1.3em;
+  text-align: center;
+  text-wrap: balance;
+  align-self: stretch;
+}
+
+/* ---------------- Waitlist form ---------------- */
+
+.waitlist {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: min-content;
+  overflow: visible;
+}
+
+.field {
+  position: relative;
+  width: 400px;
+  height: 50px;
+  background: var(--dark);
+  border: 1px solid var(--input-border);
+  border-radius: 25px;
+  transition: border-color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+}
+
+.field:focus-within {
+  border-color: var(--focus-blue);
+}
+
+.field input {
+  width: 100%;
+  height: 100%;
+  padding: 12px 12px 12px 20px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0em;
+  line-height: 1.2em;
+  color: #999999;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.field input::placeholder {
+  color: var(--clear-gray);
+  opacity: 1;
+}
+
+.button-wrap {
+  position: absolute;
+  z-index: 1;
+  height: 50px;
+  top: calc(50% - 25px);
+  left: 250px;
+  right: 0;
+  padding: 4px;
+  padding-left: 0;
+}
+
+.button-wrap button {
+  width: 100%;
+  height: 100%;
+  border: none;
+  cursor: pointer;
+  background: var(--clear-gray);
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s cubic-bezier(0.44, 0, 0.56, 1), background 0.2s;
+  color: var(--dark);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0em;
+  line-height: 1;
+  padding: 0;
+}
+
+.button-wrap button:hover {
+  background: #e8e8e8;
+}
+
+.button-wrap button:active {
+  transform: scale(0.97);
+}
+
+/* form success state */
+.field.success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.field.success .success-msg {
+  color: var(--clear-gray);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0em;
+}
+
+/* ---------------- Social links ---------------- */
+
+.social {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  width: min-content;
+}
+
+.social a {
+  color: var(--clear-gray);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.6em;
+  white-space: pre;
+  font-feature-settings: "blwf" on, "cv03" on, "cv04" on, "cv09" on, "cv11" on;
+  transition: color 0.3s cubic-bezier(0.44, 0, 0.56, 1);
+}
+
+.social a:hover {
+  color: var(--white);
+}
+
+.social .dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--clear-gray);
+  flex-shrink: 0;
+}
+
+/* ---------------- Footer ---------------- */
+
+.footer {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.footer p {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.6em;
+  white-space: pre;
+  font-feature-settings: "blwf" on, "cv03" on, "cv04" on, "cv09" on, "cv11" on;
+}
+
+.footer-label {
+  color: var(--clear-gray);
+}
+
+.footer-link a {
+  color: var(--white);
+  text-decoration: none;
+}
+
+/* ---------------- Entrance animations ---------------- */
+
+.headline .w,
+.body-text .w {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(16px);
+  animation: word-in 0.9s cubic-bezier(0.22, 0.61, 0.21, 1) forwards;
+  will-change: transform, filter, opacity;
+}
+
+@keyframes word-in {
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+[data-appear] {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fade-up 0.8s cubic-bezier(0.22, 0.61, 0.21, 1) forwards;
+}
+
+[data-appear="badge"]  { animation-delay: 0.10s; }
+[data-appear="form"]   { animation-delay: 1.25s; }
+[data-appear="social"] { animation-delay: 1.45s; }
+
+/* footer keeps its translateX(-50%) positioning — fade opacity only */
+[data-appear="footer"] {
+  transform: translateX(-50%);
+  animation-name: fade-in;
+  animation-delay: 1.60s;
+}
+
+@keyframes fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headline .w,
+  .body-text .w,
+  [data-appear] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  /* footer still needs its horizontal centering */
+  [data-appear="footer"] {
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* ?freeze verification mode: everything at its final state */
+.freeze .headline .w,
+.freeze .body-text .w,
+.freeze [data-appear] {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+.freeze [data-appear="footer"] {
+  transform: translateX(-50%) !important;
+}
+
+/* ?plainstar / ?hidestar verification modes */
+.plainstar .star,
+.plainstar .star-inner {
+  mix-blend-mode: normal !important;
+}
+
+.hidestar .star {
+  display: none !important;
+}
+
+/* ============================================================
+   Responsive — tablet (810px – 1199px)
+   ============================================================ */
+
+@media (max-width: 1199.98px) and (min-width: 810px) {
+  .headline {
+    font-size: 50px;
+  }
+
+  .body-text {
+    font-size: 13px;
+  }
+
+  .page {
+    height: 92vh;
+  }
+}
+
+/* ============================================================
+   Responsive — mobile (< 810px)
+   ============================================================ */
+
+@media (max-width: 809.98px) {
+  .page {
+    height: 92vh;
+    padding: 0 30px;
+  }
+
+  .col {
+    gap: 15px;
+  }
+
+  .header {
+    gap: 8px;
+  }
+
+  .slogan,
+  .headline {
+    width: 100%;
+  }
+
+  .headline {
+    font-size: 33px;
+  }
+
+  .content {
+    gap: 18px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .body-text {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .waitlist {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .field {
+    width: 100%;
+    height: 42px;
+  }
+
+  .button-wrap {
+    height: 42px;
+    top: calc(50% - 21px);
+    left: 195px;
+  }
+
+  .star {
+    top: 120px;
+  }
+
+  .star-inner {
+    width: 100%;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

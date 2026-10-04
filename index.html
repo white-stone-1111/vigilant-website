@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endors.io | Waitlist</title>
+  <meta name="description" content="Social proof infrastructure for agencies and info-product companies.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Animated shader background -->
+  <div class="background" aria-hidden="true">
+    <canvas id="bg-canvas"></canvas>
+  </div>
+
+  <!-- Iridescent glass "e" -->
+  <div class="star" aria-hidden="true">
+    <div class="star-inner">
+      <div class="star-img-wrap">
+        <img src="assets/star.png" alt="" width="1422" height="1422" decoding="auto">
+      </div>
+    </div>
+  </div>
+
+  <!-- Page content -->
+  <main class="page">
+    <div class="col">
+
+      <header class="header">
+        <div class="badge" data-appear="badge">
+          <p class="coming">coming</p>
+          <p class="soon">soon</p>
+        </div>
+        <div class="slogan">
+          <h1 class="headline" id="headline">Something good is coming.</h1>
+        </div>
+      </header>
+
+      <div class="content">
+        <p class="body-text" id="body-text">If you want to be among the first businesses to try Endors, register your interest below and we'll be in touch.</p>
+
+        <form class="waitlist" id="waitlist-form" data-appear="form" novalidate>
+          <div class="field">
+            <input type="email" name="Email" required placeholder="Your Email Address" autocomplete="email" aria-label="Your Email Address">
+            <div class="button-wrap">
+              <button type="submit">Get Notified</button>
+            </div>
+          </div>
+        </form>
+
+        <nav class="social" data-appear="social">
+          <a href="https://www.instagram.com/endorsapp" target="_blank" rel="noopener">Instagram</a>
+          <span class="dot" aria-hidden="true"></span>
+          <a href="https://www.linkedin.com/company/endorsapp" target="_blank" rel="noopener">Linkedin</a>
+          <span class="dot" aria-hidden="true"></span>
+          <a href="https://x.com/endorsapp" target="_blank" rel="noopener">X</a>
+        </nav>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" data-appear="footer">
+    <p class="footer-label">Inquire at:</p>
+    <p class="footer-link"><a href="mailto:admin@endors.io">admin@endors.io</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
