@@ -304,7 +304,7 @@ void main(){
 
       var field = form.querySelector('.field');
       field.classList.add('success');
-      field.innerHTML = '<p class="success-msg">Thanks — you’re on the list.</p>';
+      field.innerHTML = '<p class="success-msg">Thank you — you’re on the list!</p>';
     });
   }
 })();
