@@ -290,21 +290,22 @@ void main(){
         form.classList.add('shake');
         return;
       }
-      // send the email to the Make.com webhook (fire-and-forget:
-      // no-cors avoids a preflight the hook wouldn't answer; the
-      // hook still receives the body)
+      // send the email to the Make.com webhook as form fields so Make
+      // exposes `email` and `submittedAt` as separate variables
+      // (urlencoded is a "simple" content type — no CORS preflight,
+      // the hook still receives the body)
       try {
         fetch('https://hook.eu2.make.com/48wsfj195r2qutyvxy1wbd2fs63j3i27', {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ email: value, submittedAt: new Date().toISOString() })
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ email: value, submittedAt: new Date().toISOString() }).toString()
         });
       } catch (err) { /* network errors still show success */ }
 
       var field = form.querySelector('.field');
       field.classList.add('success');
-      field.innerHTML = '<p class="success-msg">Thank you — you’re on the list!</p>';
+      field.innerHTML = '<p class="success-msg">Thank you, you’re on the list!</p>';
     });
   }
 })();
