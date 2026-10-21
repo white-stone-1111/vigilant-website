@@ -3,6 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <script>
+    (function () {
+      var draft = false;
+      try {
+        draft = window.location.hash === "#draft" ||
+          /[?&]draft=1/.test(window.location.search);
+      } catch (e) {}
+      if (draft) {
+        document.documentElement.setAttribute("data-draft", "1");
+        return;
+      }
+      document.title = "404 \u2014 Page not found | Endors Documentation";
+      var meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.remove();
+      document.addEventListener("DOMContentLoaded", function () {
+        var main = document.querySelector(".docs-main");
+        if (!main) return;
+        main.innerHTML =
+          '<div class="docs-wrap"><article class="docs-content" style="padding-top:4rem">' +
+          '<h1>404 \u2014 Page not found</h1>' +
+          '<p class="page-lede">This page does not exist or has been moved.</p>' +
+          '<p><a class="btn btn--primary" href="/documentation/">Back to the docs</a></p>' +
+          "</article></div>";
+        var toc = document.querySelector(".docs-toc");
+        if (toc) toc.remove();
+      });
+    })();
+  </script>
   <title>Quickstart | Endors Documentation</title>
   <meta name="description" content="Install the Endors snippet and render your first testimonial widget in under five minutes.">
   <link rel="icon" type="image/png" href="/assets/favicon.png">
@@ -38,25 +67,25 @@
         <div class="nav-section">
           <p class="nav-section-title">Getting started</p>
           <a class="nav-item" href="/documentation/">Introduction</a>
-          <a class="nav-item" href="/documentation/guides/quickstart" aria-current="page">Quickstart</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Core concepts</a>
         </div>
 
         <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
           <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#list-testimonials"><span class="method method--get">GET</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#create-testimonial"><span class="method method--post">POST</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#delete-testimonial"><span class="method method--delete">DEL</span> Testimonials</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
         </div>
 
-        <div class="nav-section">
-          <p class="nav-section-title">Guides</p>
-          <a class="nav-item" href="/documentation/guides/concepts">Collecting proof</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Embedding widgets</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Webhooks</a>
-        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -87,7 +116,7 @@
           <nav class="breadcrumbs" aria-label="Breadcrumb">
             <a href="/documentation/">Docs</a>
             <span class="sep">/</span>
-            <a href="/documentation/guides/quickstart">Guides</a>
+            <a href="/documentation/">Guides</a>
             <span class="sep">/</span>
             <span aria-current="page">Quickstart</span>
           </nav>
@@ -119,7 +148,7 @@
             <div>
               <span class="callout-title">Tip</span>
               <p>One space per client or product keeps widgets, forms and analytics cleanly
-              separated. See <a href="/documentation/guides/concepts">core concepts</a> for the full model.</p>
+              separated. See the <a href="/documentation/api/reference">API overview</a> for the full model.</p>
             </div>
           </div>
 
@@ -200,12 +229,12 @@
 
           <h2 id="next-steps">Next steps</h2>
           <div class="card-grid">
-            <a class="doc-card" href="/documentation/guides/concepts">
+            <a class="doc-card" href="/documentation/api/webhooks">
               <span class="card-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
               </span>
-              <span class="card-title">Core concepts</span>
-              <span class="card-desc">Understand spaces, widgets and webhooks before going further.</span>
+              <span class="card-title">Webhooks</span>
+              <span class="card-desc">React to new testimonials, approvals and deletions in real time.</span>
               <span class="card-link-more">Read
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
@@ -215,7 +244,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
               </span>
               <span class="card-title">API reference</span>
-              <span class="card-desc">Automate collection and rendering with the REST API.</span>
+              <span class="card-desc">Browse the full REST API — auth, testimonials, search, webhooks and more.</span>
               <span class="card-link-more">Read
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
@@ -233,12 +262,12 @@
               </span>
               <span class="pager-title">Introduction</span>
             </a>
-            <a class="pager-link pager-link--next" href="/documentation/guides/concepts">
+            <a class="pager-link pager-link--next" href="/documentation/api/reference">
               <span class="pager-dir">
                 Next
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-              <span class="pager-title">Core concepts</span>
+              <span class="pager-title">API reference</span>
             </a>
           </nav>
 

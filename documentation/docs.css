@@ -922,13 +922,22 @@ html[data-theme="dark"] .method--post { background: rgba(77, 148, 255, 0.12); co
   border-radius: var(--radius-sm);
 }
 
-/* request / response split */
+/* request / response split — stacked, never side-by-side: the 720px
+   content column is too narrow for two code blocks without overflowing
+   into the TOC rail */
 .req-res {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   margin: 0 0 24px;
   align-items: start;
+}
+
+/* grid items size to min-content by default, so a long code line would
+   widen the track past the 720px column — clamp the item and let the
+   inner <pre> scroll instead */
+.req-res > * {
+  min-width: 0;
 }
 
 .req-res .req-res-label {
@@ -1438,8 +1447,7 @@ html[data-theme="dark"] .method--post { background: rgba(77, 148, 255, 0.12); co
   }
 
   .card-grid,
-  .card-grid--3,
-  .req-res {
+  .card-grid--3 {
     grid-template-columns: 1fr;
   }
 

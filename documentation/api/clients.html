@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients API | Endors Documentation</title>
+  <meta name="description" content="Create and list clients through the Endors API — full profile and CRM fields, custom field values, and per-client testimonial listings.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/documentation/docs.css">
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("endors-docs-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="docs-layout">
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-header">
+        <a class="sidebar-logo" href="/documentation/">endors</a>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Search docs" aria-label="Search docs">
+          <kbd>/</kbd>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Documentation">
+        <div class="nav-section">
+          <p class="nav-section-title">Getting started</p>
+          <a class="nav-item" href="/documentation/">Introduction</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">API reference</p>
+          <a class="nav-item" href="/documentation/api/reference">API overview</a>
+          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients" aria-current="page">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-note">endors.io</span>
+        <button class="theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ============ Mobile topbar ============ -->
+    <header class="docs-topbar">
+      <button class="sidebar-open-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="sidebar-logo" href="/documentation/">endors</a>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="docs-main">
+      <div class="docs-wrap">
+
+        <article class="docs-content">
+
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/documentation/">Docs</a>
+            <span class="sep">/</span>
+            <a href="/documentation/api/reference">API reference</a>
+            <span class="sep">/</span>
+            <span aria-current="page">Clients</span>
+          </nav>
+
+          <h1>Clients</h1>
+          <p class="page-lede">
+            Clients are the people behind the proof. Create them with the same payload
+            the dashboard uses, list them with full profile and CRM fields, and pull
+            the testimonials attached to any one of them.
+          </p>
+
+          <h2 id="list-clients">List clients</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--get">GET</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/clients</code>
+            </div>
+            <div class="endpoint-body">
+              <p>
+                Returns all non-deleted clients in the space with full profile and CRM
+                fields, including custom field values. No pagination — the entire list is
+                returned.
+              </p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <h2 id="create-client">Create a client</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/clients</code>
+            </div>
+            <div class="endpoint-body">
+              <p>
+                Creates a client with the same payload as the dashboard's create form —
+                billing gates and the <code>client.created</code> webhook fire identically.
+              </p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>first_name</code></td>
+                  <td>string</td>
+                  <td><span class="chip chip--accent">required</span></td>
+                  <td>Client's first name.</td>
+                </tr>
+                <tr>
+                  <td><code>last_name</code>, <code>email</code>, <code>company</code>, <code>phone</code>, <code>website</code>, <code>job_title</code>, <code>location</code>, <code>notes</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Profile fields. Email is lowercased on write.</td>
+                </tr>
+                <tr>
+                  <td><code>product</code>, <code>service</code>, <code>outcome</code>, <code>industry</code>, <code>business_type</code>, <code>customer_segment</code>, <code>gender</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Context fields used by <a href="/documentation/api/proof-match">proof match</a> and <a href="/documentation/api/search">AI search</a>.</td>
+                </tr>
+                <tr>
+                  <td><code>quote</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Short pull-quote, max 150 characters.</td>
+                </tr>
+                <tr>
+                  <td><code>tags</code></td>
+                  <td>string[]</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Free-form tags.</td>
+                </tr>
+                <tr>
+                  <td><code>custom_field_values</code></td>
+                  <td>object</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Values keyed by custom field.</td>
+                </tr>
+                <tr>
+                  <td><code>profile_image_url</code>, <code>company_logo_url</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Image URLs shown on widgets.</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td><code>active</code> (default), <code>inactive</code> or <code>paused</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">create-client.sh</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/clients" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "first_name": "Sarah",
+    "last_name": "Mitchell",
+    "email": "sarah@northwind.io",
+    "company": "Northwind",
+    "industry": "Dental",
+    "tags": ["case-study", "q4"]
+  }'
+
+# → 201 { "ok": true, "data": { "clientId": "7a1e…", "first_name": "Sarah", … } }</code></pre>
+          </div>
+
+          <div class="callout callout--tip">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">You often don't need this call</span>
+              <p><a href="/documentation/api/testimonials#create-testimonial">Creating a
+              testimonial</a> with <code>client_first_name</code> +
+              <code>client_email</code> find-or-creates the client for you — use this
+              endpoint when you want the client to exist before any proof does.</p>
+            </div>
+          </div>
+
+          <h2 id="client-testimonials">List a client's testimonials</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--get">GET</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/clients/<span class="param">{clientId}</span>/testimonials</code>
+            </div>
+            <div class="endpoint-body">
+              <p>
+                Lists the testimonials attached to one client, newest first, with
+                expanded asset URLs. Hard limit of 50 rows.
+              </p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": true,
+  "data": [
+    {
+      "id": "b3f2…",
+      "type": "text",
+      "text_content": "They cut our CAC nearly in half in six months.",
+      "rating": 5,
+      "status": "approved",
+      "active_asset": null
+    }
+  ]
+}</code></pre>
+          </div>
+
+          <hr>
+
+          <!-- Previous / Next -->
+          <nav class="pager" aria-label="Pagination">
+            <a class="pager-link" href="/documentation/api/testimonials">
+              <span class="pager-dir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+                Previous
+              </span>
+              <span class="pager-title">Testimonials</span>
+            </a>
+            <a class="pager-link pager-link--next" href="/documentation/api/folders">
+              <span class="pager-dir">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+              <span class="pager-title">Folders</span>
+            </a>
+          </nav>
+
+          <footer class="docs-page-footer">
+            <span>Last updated Oct 2026</span>
+            <a href="/documentation/">Back to endors.io</a>
+          </footer>
+
+        </article>
+
+        <!-- ============ On this page ============ -->
+        <aside class="docs-toc">
+          <p class="toc-title">On this page</p>
+          <ul class="toc-list">
+            <li><a href="#list-clients">List clients</a></li>
+            <li><a href="#create-client">Create a client</a></li>
+            <li><a href="#client-testimonials">List a client's testimonials</a></li>
+          </ul>
+        </aside>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/documentation/docs.js" defer></script>
+</body>
+</html>

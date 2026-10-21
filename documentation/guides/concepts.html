@@ -3,6 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <script>
+    (function () {
+      var draft = false;
+      try {
+        draft = window.location.hash === "#draft" ||
+          /[?&]draft=1/.test(window.location.search);
+      } catch (e) {}
+      if (draft) {
+        document.documentElement.setAttribute("data-draft", "1");
+        return;
+      }
+      document.title = "404 \u2014 Page not found | Endors Documentation";
+      var meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.remove();
+      document.addEventListener("DOMContentLoaded", function () {
+        var main = document.querySelector(".docs-main");
+        if (!main) return;
+        main.innerHTML =
+          '<div class="docs-wrap"><article class="docs-content" style="padding-top:4rem">' +
+          '<h1>404 \u2014 Page not found</h1>' +
+          '<p class="page-lede">This page does not exist or has been moved.</p>' +
+          '<p><a class="btn btn--primary" href="/documentation/">Back to the docs</a></p>' +
+          "</article></div>";
+        var toc = document.querySelector(".docs-toc");
+        if (toc) toc.remove();
+      });
+    })();
+  </script>
   <title>Core Concepts | Endors Documentation</title>
   <meta name="description" content="Template page for guide and concept articles — long-form prose, steps, callouts, figures and related-reading cards.">
   <link rel="icon" type="image/png" href="/assets/favicon.png">
@@ -38,25 +67,25 @@
         <div class="nav-section">
           <p class="nav-section-title">Getting started</p>
           <a class="nav-item" href="/documentation/">Introduction</a>
-          <a class="nav-item" href="/documentation/guides/quickstart">Quickstart</a>
-          <a class="nav-item" href="/documentation/guides/concepts" aria-current="page">Core concepts</a>
         </div>
 
         <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
           <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#list-testimonials"><span class="method method--get">GET</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#create-testimonial"><span class="method method--post">POST</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#delete-testimonial"><span class="method method--delete">DEL</span> Testimonials</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
         </div>
 
-        <div class="nav-section">
-          <p class="nav-section-title">Guides</p>
-          <a class="nav-item" href="/documentation/guides/concepts">Collecting proof</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Embedding widgets</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Webhooks</a>
-        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -241,17 +270,17 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
               </span>
               <span class="card-title">API reference</span>
-              <span class="card-desc">Every endpoint, parameter and error code in one place.</span>
+              <span class="card-desc">Every endpoint, parameter and error code, page by page.</span>
               <span class="card-link-more">Read
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
             </a>
-            <a class="doc-card" href="/documentation/guides/quickstart">
+            <a class="doc-card" href="/documentation/api/reference">
               <span class="card-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5L18.5 10H12l1-8Z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg>
               </span>
-              <span class="card-title">Quickstart</span>
-              <span class="card-desc">Put the concepts to work with a working embed in minutes.</span>
+              <span class="card-title">API reference</span>
+              <span class="card-desc">Every endpoint, parameter and error code, page by page.</span>
               <span class="card-link-more">Read
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
@@ -262,12 +291,12 @@
 
           <!-- Previous / Next -->
           <nav class="pager" aria-label="Pagination">
-            <a class="pager-link" href="/documentation/guides/quickstart">
+            <a class="pager-link" href="/documentation/">
               <span class="pager-dir">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
                 Previous
               </span>
-              <span class="pager-title">Quickstart</span>
+              <span class="pager-title">Introduction</span>
             </a>
             <a class="pager-link pager-link--next" href="/documentation/api/reference">
               <span class="pager-dir">

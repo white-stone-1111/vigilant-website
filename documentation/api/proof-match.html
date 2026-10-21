@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proof Match API | Endors Documentation</title>
+  <meta name="description" content="Match a prospect to the strongest proof in a workspace through the Endors API — scored, grounded reasons for every match.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/documentation/docs.css">
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("endors-docs-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="docs-layout">
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-header">
+        <a class="sidebar-logo" href="/documentation/">endors</a>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Search docs" aria-label="Search docs">
+          <kbd>/</kbd>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Documentation">
+        <div class="nav-section">
+          <p class="nav-section-title">Getting started</p>
+          <a class="nav-item" href="/documentation/">Introduction</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">API reference</p>
+          <a class="nav-item" href="/documentation/api/reference">API overview</a>
+          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match" aria-current="page">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-note">endors.io</span>
+        <button class="theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ============ Mobile topbar ============ -->
+    <header class="docs-topbar">
+      <button class="sidebar-open-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="sidebar-logo" href="/documentation/">endors</a>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="docs-main">
+      <div class="docs-wrap">
+
+        <article class="docs-content">
+
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/documentation/">Docs</a>
+            <span class="sep">/</span>
+            <a href="/documentation/api/reference">API reference</a>
+            <span class="sep">/</span>
+            <span aria-current="page">Proof match</span>
+          </nav>
+
+          <h1>Proof match</h1>
+          <p class="page-lede">
+            Given a prospect description and/or structured prospect data, returns the
+            strongest relevant proof from the workspace with scored, grounded reasons —
+            the same output as the dashboard's proof-match flow. Built for sales
+            assistants and pre-call prep.
+          </p>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/proof/match</code>
+            </div>
+            <div class="endpoint-body">
+              <p>
+                Deterministic per request: at most one LLM interpretation call and one
+                embedding call, both degrading gracefully. An empty <code>matches</code>
+                array with a <code>coverage</code> object is a normal "no match"
+                result, not an error.
+              </p>
+            </div>
+          </div>
+
+          <h2 id="request-body">Request body</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>description</code></td>
+                  <td>string</td>
+                  <td>Free-form prospect description. At least this or one meaningful <code>prospect</code> field is required.</td>
+                </tr>
+                <tr>
+                  <td><code>prospect</code></td>
+                  <td>object</td>
+                  <td>Structured prospect: <code>industry</code>, <code>subIndustry</code>, <code>businessType</code>, <code>companySize</code>, <code>customerSegment</code>, <code>location</code>, <code>productOrService</code>, <code>gender</code>, <code>revenue</code> (<code>{ value, currency, period }</code>), <code>painPoints</code>, <code>desiredOutcomes</code>, <code>objections</code>, <code>previousAlternatives</code>, <code>notes</code>, <code>customFields</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>filters</code></td>
+                  <td>object</td>
+                  <td>Hard filters: <code>assetTypes</code> (<code>video</code>, <code>image</code>, <code>text</code>, <code>document</code>, <code>transformation</code>), <code>clientIds</code>, <code>industries</code>, <code>outcomes</code>, <code>hasQuantitativeResult</code>, <code>gender</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>eligibility</code></td>
+                  <td>string</td>
+                  <td><code>shareable</code> (default) — only approved, shareable proof; or <code>library</code> for everything.</td>
+                </tr>
+                <tr>
+                  <td><code>limit</code></td>
+                  <td>integer</td>
+                  <td>Max matches. Defaults to 5, capped at 20.</td>
+                </tr>
+                <tr>
+                  <td><code>includeScoreBreakdown</code></td>
+                  <td>boolean</td>
+                  <td>Include the per-dimension score breakdown on each match.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="req-res">
+            <div>
+              <p class="req-res-label">Request</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">bash</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/proof/match" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "UK dental agency doing ~£50k/mo, struggling with CAC",
+    "prospect": {
+      "industry": "Dental",
+      "businessType": "Agency",
+      "customerSegment": "B2B",
+      "location": "UK",
+      "revenue": { "value": 50000, "currency": "GBP", "period": "month" },
+      "painPoints": ["high CAC"],
+      "desiredOutcomes": ["reduce CAC"]
+    },
+    "filters": { "assetTypes": ["video"] },
+    "limit": 5
+  }'</code></pre>
+              </div>
+            </div>
+            <div>
+              <p class="req-res-label">Response</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">json</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-json">{
+  "ok": true,
+  "data": {
+    "matches": [
+      {
+        "proofId": "b3f2…",
+        "proofType": "text",
+        "title": "Sarah Mitchell",
+        "client": { "id": "7a1e…", "name": "Sarah Mitchell", "company": "Northwind" },
+        "excerpt": "Our dental agency cut CAC from $94 to $61 in six months.",
+        "shareUrl": "https://app.endors.io/share/ab12cd34ef",
+        "score": 0.82,
+        "reasons": [
+          { "code": "industry", "label": "Same industry: Dental", "confidence": 1.0 },
+          { "code": "objection", "label": "Matches the objection: a previous agency failed", "confidence": 1.0 },
+          { "code": "metric", "label": "Verified CAC: $94 to $61", "confidence": 0.9 }
+        ]
+      }
+    ],
+    "coverage": { "eligibleAssets": 4, "indexedAssets": 3, "matchedCandidates": 4, "unprocessedAssets": 1 }
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <h2 id="matching-rules">Matching rules</h2>
+          <ul>
+            <li><strong>Grounded reasons only.</strong> Every <code>reason</code> maps to
+            stored proof metadata, normalized text, or a structured metric — never to
+            private notes or sensitive custom-field values.</li>
+            <li><strong>No guessed values.</strong> A missing value is never converted
+            into a guessed one; a conflicting inferred value never overwrites a known
+            explicit one.</li>
+            <li><strong>Gender signals.</strong> <code>prospect.gender</code> is a soft
+            signal — a match adds an identity-strength reason ("Same gender: female"),
+            a mismatch adds nothing. <code>filters.gender</code> is a hard filter —
+            only testimonials whose client gender matches (after a synonym layer:
+            <em>woman/female/she</em> → <code>female</code>,
+            <em>man/male/he</em> → <code>male</code>) are returned. The deterministic
+            engine matches only the stored client field; it never infers gender from
+            names or pronouns.</li>
+          </ul>
+
+          <div class="callout callout--note">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Tenancy is fixed</span>
+              <p><code>spaceId</code> and caller identity are never taken from the
+              body — they come from the path and your key. A response always covers the
+              key's own space.</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Previous / Next -->
+          <nav class="pager" aria-label="Pagination">
+            <a class="pager-link" href="/documentation/api/search">
+              <span class="pager-dir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+                Previous
+              </span>
+              <span class="pager-title">AI search</span>
+            </a>
+            <a class="pager-link pager-link--next" href="/documentation/api/pre-call-pages">
+              <span class="pager-dir">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+              <span class="pager-title">Pre-Call pages</span>
+            </a>
+          </nav>
+
+          <footer class="docs-page-footer">
+            <span>Last updated Oct 2026</span>
+            <a href="/documentation/">Back to endors.io</a>
+          </footer>
+
+        </article>
+
+        <!-- ============ On this page ============ -->
+        <aside class="docs-toc">
+          <p class="toc-title">On this page</p>
+          <ul class="toc-list">
+            <li><a href="#request-body">Request body</a></li>
+            <li><a href="#matching-rules">Matching rules</a></li>
+          </ul>
+        </aside>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/documentation/docs.js" defer></script>
+</body>
+</html>

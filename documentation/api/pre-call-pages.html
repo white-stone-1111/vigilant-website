@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pre-Call Pages API | Endors Documentation</title>
+  <meta name="description" content="Generate a personalized Pre-Call page for a prospect through the Endors API — CRM enrichment, AI proof matching, and an NDJSON progress stream.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/documentation/docs.css">
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("endors-docs-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="docs-layout">
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-header">
+        <a class="sidebar-logo" href="/documentation/">endors</a>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Search docs" aria-label="Search docs">
+          <kbd>/</kbd>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Documentation">
+        <div class="nav-section">
+          <p class="nav-section-title">Getting started</p>
+          <a class="nav-item" href="/documentation/">Introduction</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">API reference</p>
+          <a class="nav-item" href="/documentation/api/reference">API overview</a>
+          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages" aria-current="page">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-note">endors.io</span>
+        <button class="theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ============ Mobile topbar ============ -->
+    <header class="docs-topbar">
+      <button class="sidebar-open-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="sidebar-logo" href="/documentation/">endors</a>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="docs-main">
+      <div class="docs-wrap">
+
+        <article class="docs-content">
+
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/documentation/">Docs</a>
+            <span class="sep">/</span>
+            <a href="/documentation/api/reference">API reference</a>
+            <span class="sep">/</span>
+            <span aria-current="page">Pre-Call pages</span>
+          </nav>
+
+          <h1>Pre-Call pages</h1>
+          <p class="page-lede">
+            Generates a personalized Pre-Call page for a prospect: optional CRM
+            enrichment, AI proof matching against the workspace, and a shareable page
+            built from one of your templates. Progress is streamed as NDJSON, so you
+            can render status in real time.
+          </p>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/pre-call-pages/generate</code>
+            </div>
+            <div class="endpoint-body">
+              <p>Generates the page and streams progress. Whole request has a 60-second budget.</p>
+            </div>
+          </div>
+
+          <h2 id="request-body">Request body</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>prospectName</code></td>
+                  <td>string</td>
+                  <td><span class="chip chip--accent">required</span></td>
+                  <td>Prospect's name, up to 200 characters.</td>
+                </tr>
+                <tr>
+                  <td><code>prospectEmail</code></td>
+                  <td>string</td>
+                  <td><span class="chip chip--accent">required</span></td>
+                  <td>Prospect's email. Also the idempotency key (10 minutes).</td>
+                </tr>
+                <tr>
+                  <td><code>makeWebhookUrl</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>CRM enrichment webhook. Falls back to the workspace default.</td>
+                </tr>
+                <tr>
+                  <td><code>templateId</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Template for the page. Falls back to the workspace default.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">pre-call.sh</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl -N -X POST "https://app.endors.io/api/spaces/$SPACE_ID/pre-call-pages/generate" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prospectName": "Jane Cooper",
+    "prospectEmail": "jane@acmedental.co",
+    "templateId": "t-9f2…"
+  }'</code></pre>
+          </div>
+
+          <h2 id="stream">The stream</h2>
+          <p>
+            The response is <code>application/x-ndjson</code> — one JSON object per
+            line. Read line by line and act on the final <code>complete</code> event:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">ndjson</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{"t":"stage","stage":"finding_prospect"}
+{"t":"stage","stage":"retrieving_crm"}
+{"t":"stage","stage":"matching"}
+{"t":"stage","stage":"generating"}
+{"t":"stage","stage":"complete","url":"https://app.endors.io/d/Xk29fj","pageId":"p-8a1…"}</code></pre>
+          </div>
+
+          <p>
+            A <code>{"t":"error"}</code> line can appear instead of a final stage —
+            codes include <code>no_prospect_data</code> (CRM enrichment returned
+            nothing usable), <code>template_invalid</code> and
+            <code>persist_failed</code>.
+          </p>
+
+          <div class="callout callout--tip">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Idempotent within 10 minutes</span>
+              <p>A repeat call for the same prospect email within 10 minutes returns
+              the existing page with <code>existing: true</code> and its URL instead of
+              generating a duplicate.</p>
+            </div>
+          </div>
+
+          <p>
+            API-key callers attribute the generated page to the space owner; the
+            dashboard's own generate flow is unchanged.
+          </p>
+
+          <hr>
+
+          <!-- Previous / Next -->
+          <nav class="pager" aria-label="Pagination">
+            <a class="pager-link" href="/documentation/api/proof-match">
+              <span class="pager-dir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+                Previous
+              </span>
+              <span class="pager-title">Proof match</span>
+            </a>
+            <a class="pager-link pager-link--next" href="/documentation/api/templates">
+              <span class="pager-dir">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+              <span class="pager-title">Templates</span>
+            </a>
+          </nav>
+
+          <footer class="docs-page-footer">
+            <span>Last updated Oct 2026</span>
+            <a href="/documentation/">Back to endors.io</a>
+          </footer>
+
+        </article>
+
+        <!-- ============ On this page ============ -->
+        <aside class="docs-toc">
+          <p class="toc-title">On this page</p>
+          <ul class="toc-list">
+            <li><a href="#request-body">Request body</a></li>
+            <li><a href="#stream">The stream</a></li>
+          </ul>
+        </aside>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/documentation/docs.js" defer></script>
+</body>
+</html>

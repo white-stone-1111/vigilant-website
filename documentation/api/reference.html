@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Reference | Endors Documentation</title>
-  <meta name="description" content="Template page for API documentation pages — endpoint blocks, code groups, parameters tables, callouts and more.">
+  <title>API Overview | Endors Documentation</title>
+  <meta name="description" content="The Endors REST API — authentication, response envelope, endpoint map and error codes. Each resource has its own page.">
   <link rel="icon" type="image/png" href="/assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,25 +38,25 @@
         <div class="nav-section">
           <p class="nav-section-title">Getting started</p>
           <a class="nav-item" href="/documentation/">Introduction</a>
-          <a class="nav-item" href="/documentation/guides/quickstart">Quickstart</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Core concepts</a>
         </div>
 
         <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference" aria-current="page">API overview</a>
           <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#list-testimonials"><span class="method method--get">GET</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#create-testimonial"><span class="method method--post">POST</span> Testimonials</a>
-          <a class="nav-item" href="/documentation/api/reference#delete-testimonial"><span class="method method--delete">DEL</span> Testimonials</a>
+          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
         </div>
 
-        <div class="nav-section">
-          <p class="nav-section-title">Guides</p>
-          <a class="nav-item" href="/documentation/guides/concepts">Collecting proof</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Embedding widgets</a>
-          <a class="nav-item" href="/documentation/guides/concepts">Webhooks</a>
-        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -92,27 +92,69 @@
             <span aria-current="page">Overview</span>
           </nav>
 
-          <h1>API reference</h1>
+          <h1>API overview</h1>
           <p class="page-lede">
-            This page is the template for every API article. It shows each formatting
-            component available to docs authors — endpoint blocks, code groups,
-            parameter tables, callouts, request/response pairs and inline styles —
-            all with lorem-ipsum placeholder content.
+            The Endors API lets you manage social proof programmatically — create clients
+            and testimonials, upload media, organize folders, build collection links, run
+            AI proof search, and generate pre-call pages — so you can plug Endors into
+            automations, CRM workflows, and MCP agents.
           </p>
           <p>
-            <span class="chip chip--accent"><span class="dot"></span> Stable</span>
-            <span class="chip"><span class="dot"></span> v1</span>
-            <span class="chip chip--green"><span class="dot"></span> 99.99% uptime</span>
+            <span class="chip chip--accent"><span class="dot"></span> REST</span>
+            <span class="chip"><span class="dot"></span> JSON</span>
+            <span class="chip chip--green"><span class="dot"></span> Growth plan required</span>
           </p>
 
-          <h2 id="base-url">Base URL</h2>
+          <h2 id="base-url">Base URL &amp; envelope</h2>
           <p>
-            All API requests are made to the following base URL over HTTPS. Plain HTTP
-            requests are rejected. Lorem ipsum dolor sit amet, consectetur adipiscing
-            elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            All endpoints are served from your deployment origin over HTTPS. There is no
+            version prefix — paths look like
+            <code>/api/spaces/{spaceId}/testimonials</code>.
           </p>
+
           <div class="code-block">
-            <pre><code class="language-text">https://api.endors.io/v1</code></pre>
+            <pre><code class="language-text">https://app.endors.io</code></pre>
+          </div>
+
+          <p>
+            Every authenticated endpoint returns a uniform envelope. On success,
+            <code>data</code> carries the payload; on failure, <code>error</code> carries a
+            stable machine-readable <code>code</code> plus a human-readable message.
+          </p>
+
+          <div class="req-res">
+            <div>
+              <p class="req-res-label">Success</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">json</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-json">{ "ok": true, "data": { "id": "…" } }</code></pre>
+              </div>
+            </div>
+            <div>
+              <p class="req-res-label">Error</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">json</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-json">{
+  "ok": false,
+  "error": {
+    "code": "PLAN_LIMIT",
+    "message": "Testimonial limit reached for this plan."
+  }
+}</code></pre>
+              </div>
+            </div>
           </div>
 
           <div class="callout callout--note">
@@ -121,25 +163,25 @@
             </span>
             <div>
               <span class="callout-title">Note</span>
-              <p>This is a <strong>note</strong> callout. Use it for neutral context that helps
-              the reader but isn't essential — e.g. that sandbox traffic shares the same
-              base URL with a different key prefix.</p>
+              <p>A few media endpoints (<code>assets/upload</code>, <code>video/create-upload</code>,
+              <code>video/status</code>) predate the envelope and return bare objects such as
+              <code>{ "assetId": "…" }</code> — this is noted per endpoint.</p>
             </div>
           </div>
 
           <h2 id="authentication">Authentication</h2>
           <p>
-            Authenticate by sending your secret key in the <code>Authorization</code> header
-            as a Bearer token. Keys starting with <code>sk_live_</code> hit live data; keys
-            starting with <code>sk_test_</code> hit the sandbox. Never expose secret keys in
-            client-side code — use a <em>public</em> key (<code>pk_live_…</code>) for widgets.
+            Send your secret API key as a Bearer token. Keys start with
+            <code>sk_live_</code> and are minted in the dashboard under
+            <strong>Settings → API &amp; Webhooks</strong>. The raw key is shown exactly
+            once at creation; only a hash and a 16-character prefix are stored. To rotate,
+            delete the key and create a new one. Each space can hold up to 3 keys.
           </p>
 
           <div class="code-group" data-group="auth">
             <div class="code-group-tabs" role="tablist">
               <button class="code-tab" role="tab" aria-selected="true" data-tab="curl">cURL</button>
               <button class="code-tab" role="tab" aria-selected="false" data-tab="js">JavaScript</button>
-              <button class="code-tab" role="tab" aria-selected="false" data-tab="python">Python</button>
             </div>
             <div class="code-block" data-panel="curl">
               <div class="code-block-header">
@@ -149,7 +191,7 @@
                   <span>Copy</span>
                 </button>
               </div>
-              <pre><code class="language-bash">curl https://api.endors.io/v1/testimonials \
+              <pre><code class="language-bash">curl https://app.endors.io/api/spaces/$SPACE_ID/testimonials \
   -H "Authorization: Bearer sk_live_4f9d8c2b7a1e"</code></pre>
             </div>
             <div class="code-block" data-panel="js" hidden>
@@ -160,273 +202,104 @@
                   <span>Copy</span>
                 </button>
               </div>
-              <pre><code class="language-js">import Endors from "@endors/sdk";
+              <pre><code class="language-js">const BASE = "https://app.endors.io";
+const KEY = process.env.ENDOR_API_KEY;
 
-const endors = new Endors("sk_live_4f9d8c2b7a1e");
+async function endors(path, options = {}) {
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${KEY}`,
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+  return res.json();
+}
 
-const testimonials = await endors.testimonials.list({ limit: 10 });</code></pre>
-            </div>
-            <div class="code-block" data-panel="python" hidden>
-              <div class="code-block-header">
-                <span class="code-lang">python</span>
-                <button class="copy-btn" type="button" data-copy>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                  <span>Copy</span>
-                </button>
-              </div>
-              <pre><code class="language-python">import endors
-
-client = endors.Client("sk_live_4f9d8c2b7a1e")
-
-testimonials = client.testimonials.list(limit=10)</code></pre>
+const { ok, data } = await endors(
+  `/api/spaces/${spaceId}/testimonials?shareLinks=1`
+);</code></pre>
             </div>
           </div>
+
+          <p>
+            Three rules govern API-key calls:
+          </p>
+          <ul>
+            <li><strong>One space per key.</strong> Every endpoint is scoped by
+            <code>{spaceId}</code> in the path. A key is bound to a single space —
+            requests for any other space's ID return <code>403</code>.</li>
+            <li><strong>Growth plan required.</strong> API access is part of the
+            <code>apiAndWebhooks</code> feature. On lower plans every keyed call returns
+            <code>403 PLAN_RESTRICTION</code> with an upgrade payload.</li>
+            <li><strong>Full access within the space.</strong> A valid key acts with
+            workspace-owner rights inside its space — keep it server-side only, never in
+            client-side code.</li>
+          </ul>
 
           <div class="callout callout--warning">
             <span class="callout-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
             </span>
             <div>
-              <span class="callout-title">Warning</span>
-              <p>This is a <strong>warning</strong> callout. Use it for things that can break an
-              integration if ignored — like committing a live secret key to a public repo.</p>
+              <span class="callout-title">Session-only endpoints</span>
+              <p>A handful of management routes (creating or editing webhooks, managing API
+              keys, embeddings, template editing, data export) accept only an authenticated
+              dashboard session and are not part of the keyed API. Each endpoint page
+              states whether API keys are accepted.</p>
             </div>
           </div>
 
-          <div class="callout callout--tip">
-            <span class="callout-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
-            </span>
-            <div>
-              <span class="callout-title">Tip</span>
-              <p>This is a <strong>tip</strong> callout. Use it for best practices — e.g. rotating
-              keys every 90 days, or pressing <kbd>⌘</kbd> <kbd>K</kbd> in the dashboard to
-              jump between spaces.</p>
-            </div>
-          </div>
-
-          <div class="callout callout--danger">
-            <span class="callout-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg>
-            </span>
-            <div>
-              <span class="callout-title">Danger</span>
-              <p>This is a <strong>danger</strong> callout. Reserve it for destructive,
-              irreversible actions — like deleting a space with all its testimonials.</p>
-            </div>
-          </div>
-
-          <h2 id="list-testimonials">List testimonials</h2>
-          <p>
-            Returns a paginated list of testimonials in a space. Lorem ipsum dolor sit
-            amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
-            labore et dolore magna aliqua — see
-            <a href="#pagination">pagination</a> below for cursor semantics.
+          <h2 id="endpoint-index">Endpoint index</h2>
+          <p class="section-desc">
+            Every keyed endpoint lives on its own page. This is the full map — open a page
+            for parameters, examples and response shapes.
           </p>
 
-          <div class="endpoint">
-            <div class="endpoint-head">
-              <span class="method method--get">GET</span>
-              <code class="endpoint-path">/v1/spaces/<span class="param">{space_id}</span>/testimonials</code>
-            </div>
-            <div class="endpoint-body">
-              <p>Query parameters:</p>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code>limit</code></td>
-                      <td>integer</td>
-                      <td>Items per page, 1–100. Defaults to <code>25</code>.</td>
-                    </tr>
-                    <tr>
-                      <td><code>cursor</code></td>
-                      <td>string</td>
-                      <td>Opaque cursor from a previous response's <code>next_cursor</code> field.</td>
-                    </tr>
-                    <tr>
-                      <td><code>status</code></td>
-                      <td>string</td>
-                      <td>Filter by status: <code>pending</code>, <code>approved</code> or <code>rejected</code>.</td>
-                    </tr>
-                    <tr>
-                      <td><code>min_rating</code></td>
-                      <td>integer</td>
-                      <td>Only return testimonials rated at or above this value (1–5).</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Resource</th><th>Endpoints</th><th>Page</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Testimonials</td><td>GET list · POST create · GET one · PATCH update</td><td><a href="/documentation/api/testimonials">Testimonials</a></td></tr>
+                <tr><td>Clients</td><td>GET list · POST create · GET a client's testimonials</td><td><a href="/documentation/api/clients">Clients</a></td></tr>
+                <tr><td>Folders</td><td>GET list · POST create</td><td><a href="/documentation/api/folders">Folders</a></td></tr>
+                <tr><td>Assets &amp; video</td><td>POST upload · video create-upload / status</td><td><a href="/documentation/api/assets">Assets &amp; video</a></td></tr>
+                <tr><td>Collection links</td><td>GET list · POST create</td><td><a href="/documentation/api/collection-links">Collection links</a></td></tr>
+                <tr><td>AI search</td><td>POST search (keyword / AI, NDJSON or JSON)</td><td><a href="/documentation/api/search">AI search</a></td></tr>
+                <tr><td>Proof match</td><td>POST proof/match</td><td><a href="/documentation/api/proof-match">Proof match</a></td></tr>
+                <tr><td>Pre-Call pages</td><td>POST pre-call-pages/generate (NDJSON)</td><td><a href="/documentation/api/pre-call-pages">Pre-Call pages</a></td></tr>
+                <tr><td>Templates</td><td>GET library · GET one template</td><td><a href="/documentation/api/templates">Templates</a></td></tr>
+                <tr><td>Webhooks</td><td>GET webhooks · GET deliveries</td><td><a href="/documentation/api/webhooks">Webhooks</a></td></tr>
+              </tbody>
+            </table>
           </div>
 
-          <div class="req-res">
-            <div>
-              <p class="req-res-label">Request</p>
-              <div class="code-block">
-                <div class="code-block-header">
-                  <span class="code-lang">http</span>
-                  <button class="copy-btn" type="button" data-copy>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                    <span>Copy</span>
-                  </button>
-                </div>
-                <pre><code class="language-http">GET /v1/spaces/spc_9x2/testimonials?limit=2 HTTP/1.1
-Host: api.endors.io
-Authorization: Bearer sk_live_4f9d8c2b7a1e</code></pre>
-              </div>
-            </div>
-            <div>
-              <p class="req-res-label">Response</p>
-              <div class="code-block">
-                <div class="code-block-header">
-                  <span class="code-lang">json</span>
-                  <button class="copy-btn" type="button" data-copy>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                    <span>Copy</span>
-                  </button>
-                </div>
-                <pre><code class="language-json">{
-  "data": [
-    {
-      "id": "tst_7h2k",
-      "author": "Jane Cooper",
-      "rating": 5,
-      "body": "Lorem ipsum dolor sit amet…",
-      "status": "approved",
-      "created_at": "2026-10-04T09:12:00Z"
-    }
-  ],
-  "next_cursor": "eyJpZCI6InRzdF83aDJrIn0"
-}</code></pre>
-              </div>
-            </div>
-          </div>
-
-          <h2 id="create-testimonial">Create a testimonial</h2>
-          <p>
-            Creates a testimonial inside a space. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          </p>
-
-          <div class="endpoint">
-            <div class="endpoint-head">
-              <span class="method method--post">POST</span>
-              <code class="endpoint-path">/v1/spaces/<span class="param">{space_id}</span>/testimonials</code>
-            </div>
-            <div class="endpoint-body">
-              <p>Body parameters:</p>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code>author</code></td>
-                      <td>string</td>
-                      <td><span class="chip chip--accent">required</span></td>
-                      <td>Display name shown on widgets.</td>
-                    </tr>
-                    <tr>
-                      <td><code>body</code></td>
-                      <td>string</td>
-                      <td><span class="chip chip--accent">required</span></td>
-                      <td>The testimonial text, up to 2,000 characters.</td>
-                    </tr>
-                    <tr>
-                      <td><code>rating</code></td>
-                      <td>integer</td>
-                      <td><span class="chip">optional</span></td>
-                      <td>1–5 stars. Omitted means no rating shown.</td>
-                    </tr>
-                    <tr>
-                      <td><code>auto_approve</code></td>
-                      <td>boolean</td>
-                      <td><span class="chip">optional</span></td>
-                      <td>Skip the review queue. Defaults to <code>false</code>.</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="code-block">
-            <div class="code-block-header">
-              <span class="code-title">create-testimonial.sh</span>
-              <button class="copy-btn" type="button" data-copy>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                <span>Copy</span>
-              </button>
-            </div>
-            <pre><code class="language-bash">curl -X POST https://api.endors.io/v1/spaces/spc_9x2/testimonials \
-  -H "Authorization: Bearer sk_live_4f9d8c2b7a1e" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "author": "Jane Cooper",
-    "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "rating": 5,
-    "auto_approve": false
-  }'</code></pre>
-          </div>
-
-          <h2 id="delete-testimonial">Delete a testimonial</h2>
-          <p>
-            Permanently deletes a testimonial. Duis aute irure dolor in reprehenderit
-            in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          </p>
-
-          <div class="endpoint">
-            <div class="endpoint-head">
-              <span class="method method--delete">DELETE</span>
-              <code class="endpoint-path">/v1/testimonials/<span class="param">{testimonial_id}</span></code>
-            </div>
-            <div class="endpoint-body">
-              <p>
-                Returns <code>204 No Content</code> on success. Deleting a testimonial
-                removes it from every widget that renders it within ~60 seconds.
-              </p>
-            </div>
-          </div>
-
-          <h2 id="pagination">Pagination</h2>
-          <p>
-            All list endpoints use cursor-based pagination. Excepteur sint occaecat
-            cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-            est laborum. Keep reading until <code>next_cursor</code> is <code>null</code>:
-          </p>
-
-          <div class="code-block">
-            <div class="code-block-header">
-              <span class="code-lang">js</span>
-              <button class="copy-btn" type="button" data-copy>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                <span>Copy</span>
-              </button>
-            </div>
-            <pre><code class="language-js">async function* allTestimonials(endors, spaceId) {
-  let cursor = null;
-  do {
-    const page = await endors.testimonials.list({
-      space: spaceId,
-      limit: 100,
-      cursor,
-    });
-    for (const t of page.data) yield t;
-    cursor = page.next_cursor;
-  } while (cursor !== null);
-}</code></pre>
-          </div>
+          <h2 id="conventions">Conventions</h2>
+          <ul>
+            <li><strong>Content type.</strong> JSON bodies for every endpoint except the
+            two multipart/raw uploads on the <a href="/documentation/api/assets">Assets
+            &amp; video</a> page.</li>
+            <li><strong>IDs in the path.</strong> Resources are addressed as
+            <code>/api/spaces/{spaceId}/{resource}/{id}</code>; a wrong or foreign id
+            fails with <code>404</code> and nothing is written.</li>
+            <li><strong>Fail-fast validation.</strong> Create endpoints validate every
+            referenced id (client, asset, folder) before writing anything — a bad
+            reference never leaves a half-created object behind.</li>
+            <li><strong>Streaming endpoints.</strong> AI search and Pre-Call pages default
+            to NDJSON streams; both accept a flag (or parameter) that returns the same
+            content as one JSON body for API callers.</li>
+            <li><strong>Webhooks.</strong> Everything created through the API fires the
+            same webhooks as the dashboard, with <code>source: "api"</code> where
+            relevant.</li>
+          </ul>
 
           <h2 id="errors">Errors</h2>
           <p>
-            Errors follow a consistent shape. Sed ut perspiciatis unde omnis iste natus
-            error sit voluptatem accusantium doloremque laudantium — the <code>code</code>
-            field is stable and safe to match on; <code>message</code> is for humans.
+            The <code>error.code</code> field is stable and safe to match on;
+            <code>error.message</code> is for humans.
           </p>
 
           <div class="table-wrap">
@@ -435,91 +308,61 @@ Authorization: Bearer sk_live_4f9d8c2b7a1e</code></pre>
                 <tr><th>Status</th><th>Code</th><th>When it happens</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>400</code></td><td><code>invalid_request</code></td><td>A parameter failed validation — check <code>message</code> for the field.</td></tr>
-                <tr><td><code>401</code></td><td><code>unauthenticated</code></td><td>Missing or malformed <code>Authorization</code> header.</td></tr>
-                <tr><td><code>403</code></td><td><code>forbidden</code></td><td>The key is valid but lacks the required scope.</td></tr>
-                <tr><td><code>404</code></td><td><code>not_found</code></td><td>The space or testimonial ID doesn't exist.</td></tr>
-                <tr><td><code>429</code></td><td><code>rate_limited</code></td><td>Too many requests — back off and retry with jitter.</td></tr>
-                <tr><td><code>500</code></td><td><code>internal_error</code></td><td>Something went wrong on our side. Safe to retry.</td></tr>
+                <tr><td><code>400</code></td><td><code>BAD_REQUEST</code></td><td>Invalid JSON or a parameter failed validation — check <code>message</code>.</td></tr>
+                <tr><td><code>401</code></td><td><code>UNAUTHORIZED</code></td><td>Missing or invalid API key.</td></tr>
+                <tr><td><code>403</code></td><td><code>FORBIDDEN</code></td><td>Key doesn't belong to <code>{spaceId}</code>, or a session caller lacks the required role.</td></tr>
+                <tr><td><code>403</code></td><td><code>PLAN_LIMIT</code></td><td>A plan limit (testimonials, embeddings, links…) is exhausted.</td></tr>
+                <tr><td><code>403</code></td><td><code>PLAN_RESTRICTION</code></td><td>The feature (API access, custom fields, external redirects…) isn't on the plan.</td></tr>
+                <tr><td><code>403</code></td><td><code>SUBSCRIPTION_REQUIRED</code></td><td>The space has no active subscription for write operations.</td></tr>
+                <tr><td><code>403</code></td><td><code>SPACE_LOCKED</code></td><td>The space is write-locked (billing issue).</td></tr>
+                <tr><td><code>404</code></td><td><code>NOT_FOUND</code></td><td>The resource doesn't exist in this space.</td></tr>
+                <tr><td><code>404</code></td><td><code>CLIENT_NOT_FOUND</code> / <code>ASSET_NOT_FOUND</code> / <code>FOLDER_NOT_FOUND</code></td><td>The referenced id is unknown or belongs to another space.</td></tr>
+                <tr><td><code>413</code></td><td>—</td><td>File too large (50 MB media, 1 GB video).</td></tr>
+                <tr><td><code>415</code></td><td>—</td><td>Unsupported file type.</td></tr>
+                <tr><td><code>500</code></td><td><code>DB_ERROR</code></td><td>Something went wrong on our side. Safe to retry once.</td></tr>
               </tbody>
             </table>
           </div>
 
-          <div class="callout callout--note">
+          <div class="callout callout--tip">
             <span class="callout-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
             </span>
             <div>
-              <span class="callout-title">Rate limits</span>
-              <p>The default limit is <mark>600 requests per minute</mark> per key, returned
-              in the <code>X-RateLimit-Remaining</code> header on every response.</p>
+              <span class="callout-title">Fail-fast validation</span>
+              <p>Create endpoints validate every referenced id (client, asset, folder)
+              before writing anything — a bad reference never leaves a half-created
+              testimonial behind.</p>
             </div>
           </div>
 
-          <h2 id="formatting-kitchen-sink">Formatting kitchen sink</h2>
+          <h2 id="getting-started-flow">A complete flow</h2>
           <p>
-            Everything below exists so future pages can copy patterns. Paragraphs can
-            contain <strong>bold text</strong>, <em>italic text</em>, <code>inline code</code>,
-            <kbd>⌘</kbd>+<kbd>K</kbd> keyboard hints, <mark>highlighted phrases</mark>, and
-            links to <a href="#authentication">sections on this page</a> or to
-            <a href="/documentation/guides/concepts">other articles</a>.
+            The endpoints compose into a full automated intake: upload media, resolve or
+            create the client, create the testimonial, and file it.
           </p>
 
-          <h3>Unordered list</h3>
-          <ul>
-            <li>Spaces group testimonials by product or client.</li>
-            <li>Widgets render a filtered view of a space.</li>
-            <li>Webhooks notify your backend when proof changes.</li>
-          </ul>
-
-          <h3>Ordered list</h3>
-          <ol>
-            <li>Create a space in the dashboard.</li>
-            <li>Collect or import testimonials.</li>
-            <li>Embed a widget or pull data via the API.</li>
-          </ol>
-
-          <h3>Steps component</h3>
           <div class="steps">
             <div class="step">
-              <p class="step-title">Get your API key</p>
-              <p>Open the dashboard, pick a space, and copy the secret key from
-              <strong>Settings → API keys</strong>. Keep it server-side only.</p>
+              <p class="step-title">1. Upload the media</p>
+              <p><code>POST /api/spaces/{spaceId}/assets/upload</code> (image) or the
+              <a href="/documentation/api/assets#upload-video">video flow</a> → get an
+              <code>assetId</code>.</p>
             </div>
             <div class="step">
-              <p class="step-title">Make your first request</p>
-              <p>Call <code>GET /v1/spaces</code> with your Bearer token. A <code>200</code>
-              with a JSON body means the key works.</p>
+              <p class="step-title">2. Create the testimonial</p>
+              <p><code>POST /api/spaces/{spaceId}/testimonials</code> with
+              <code>asset_id</code> plus <code>client_first_name</code> /
+              <code>client_email</code> — the client is found or created automatically →
+              get <code>testimonialId</code> and <code>shareUrl</code>.</p>
             </div>
             <div class="step">
-              <p class="step-title">Handle errors</p>
-              <p>Match on <code>error.code</code>, back off on <code>429</code>, and alert on
-              repeated <code>5xx</code> responses.</p>
+              <p class="step-title">3. Organize and react</p>
+              <p>PATCH the testimonial into folders, subscribe to
+              <code>testimonial.created</code> to push it downstream, and query it back
+              with <a href="/documentation/api/proof-match">proof match</a> when a sales
+              conversation needs it.</p>
             </div>
-          </div>
-
-          <h3>Related reading (cards)</h3>
-          <div class="card-grid">
-            <a class="doc-card" href="/documentation/guides/quickstart">
-              <span class="card-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5L18.5 10H12l1-8Z"/></svg>
-              </span>
-              <span class="card-title">Quickstart</span>
-              <span class="card-desc">Render your first widget in under five minutes.</span>
-              <span class="card-link-more">Read
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </span>
-            </a>
-            <a class="doc-card" href="/documentation/guides/concepts">
-              <span class="card-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
-              </span>
-              <span class="card-title">Core concepts</span>
-              <span class="card-desc">The mental model behind spaces, widgets and webhooks.</span>
-              <span class="card-link-more">Read
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </span>
-            </a>
           </div>
 
           <hr>
@@ -533,12 +376,12 @@ Authorization: Bearer sk_live_4f9d8c2b7a1e</code></pre>
               </span>
               <span class="pager-title">Introduction</span>
             </a>
-            <a class="pager-link pager-link--next" href="/documentation/guides/quickstart">
+            <a class="pager-link pager-link--next" href="/documentation/api/testimonials">
               <span class="pager-dir">
                 Next
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-              <span class="pager-title">Quickstart</span>
+              <span class="pager-title">Testimonials</span>
             </a>
           </nav>
 
@@ -553,14 +396,12 @@ Authorization: Bearer sk_live_4f9d8c2b7a1e</code></pre>
         <aside class="docs-toc">
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
-            <li><a href="#base-url">Base URL</a></li>
+            <li><a href="#base-url">Base URL &amp; envelope</a></li>
             <li><a href="#authentication">Authentication</a></li>
-            <li><a href="#list-testimonials">List testimonials</a></li>
-            <li><a href="#create-testimonial">Create a testimonial</a></li>
-            <li><a href="#delete-testimonial">Delete a testimonial</a></li>
-            <li><a href="#pagination">Pagination</a></li>
+            <li><a href="#endpoint-index">Endpoint index</a></li>
+            <li><a href="#conventions">Conventions</a></li>
             <li><a href="#errors">Errors</a></li>
-            <li><a href="#formatting-kitchen-sink">Formatting kitchen sink</a></li>
+            <li><a href="#getting-started-flow">A complete flow</a></li>
           </ul>
         </aside>
 
