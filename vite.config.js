@@ -50,6 +50,23 @@ function extensionlessDocsUrls() {
   };
 }
 
+/**
+ * Copy the documentation folder into dist/ on build. Vercel serves the
+ * build output, so without this /documentation 404s in production even
+ * though it works locally.
+ */
+function copyDocumentation() {
+  return {
+    name: "copy-documentation",
+    closeBundle() {
+      const src = path.resolve(__dirname, "documentation");
+      const out = path.resolve(__dirname, "dist/documentation");
+      fs.cpSync(src, out, { recursive: true });
+      console.log("  copied documentation/ → dist/documentation/");
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [extensionlessDocsUrls()],
+  plugins: [extensionlessDocsUrls(), copyDocumentation()],
 });
