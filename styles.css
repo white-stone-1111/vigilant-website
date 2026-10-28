@@ -309,6 +309,51 @@ body {
   letter-spacing: 0em;
 }
 
+/* ---------------- Alternative CTA (discovery call) ---------------- */
+
+.alt-cta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 400px;
+  max-width: 100%;
+}
+
+.alt-cta .or {
+  color: var(--clear-gray);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.6em;
+}
+
+.alt-cta .discovery-btn {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--white);
+  color: var(--dark);
+  text-decoration: none;
+  border-radius: 25px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.44, 0, 0.56, 1);
+}
+
+.alt-cta .discovery-btn:hover {
+  background: #e8e8e8;
+}
+
+.alt-cta .discovery-btn:active {
+  transform: scale(0.97);
+}
+
 /* ---------------- Social links ---------------- */
 
 .social {
@@ -537,6 +582,10 @@ body {
     height: 42px;
     top: calc(50% - 21px);
     left: 195px;
+  }
+
+  .alt-cta .discovery-btn {
+    height: 42px;
   }
 
   .star {
