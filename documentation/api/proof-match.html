@@ -263,9 +263,10 @@
           <h2 id="using-match-in-flows">Using match in flows: prefetch, freshness, and storage</h2>
           <p>
             <strong>Prefetch at data-complete, render at the moment of need.</strong>
-            A match call takes a couple of seconds (one interpretation call, one
-            embedding call) — don't make the user wait for it inside the surface.
-            Call <code>match</code> as soon as the scenario's input data is complete
+            A match call is an LLM round-trip plus an embedding round-trip:
+            typically a few seconds, but allow up to ~20 seconds worst case.
+            Never make the user wait for it inline. Call
+            <code>match</code> as soon as the scenario's input data is complete
             (form submit, profile save, plan-selection intent), hold the response,
             and render it when the user actually reaches the moment: onboarding, an
             upgrade prompt, a cancel flow.
@@ -325,9 +326,13 @@ const { matches, coverage } = await matchPromise;</code></pre>
             your log stays truthful, and a stored excerpt would go stale.</li>
             <li><strong>Anti-pattern:</strong> copying <code>excerpt</code>s as
             durable content. That forks the canonical text and breaks revocation.</li>
-            <li>There is no proof get-by-id endpoint. If you need
-            <code>proofId</code> later, re-match — it's cheap, and the result is
-            current.</li>
+            <li><code>proofId</code> is the Endors testimonial id. To re-hydrate
+            a stored set later, fetch by id through the Testimonials API —
+            <code>GET /testimonials/{id}</code> for one, or
+            <code>testimonials?id=a,b,c</code> to hydrate a whole stored set in
+            one call — and render only rows whose status is still approved. That
+            returns the current content (edits, unshares, and deletions are all
+            visible), which is why storing ids beats storing excerpts.</li>
           </ul>
 
           <h2 id="errors">Errors</h2>
