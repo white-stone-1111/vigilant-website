@@ -246,7 +246,9 @@ const match = await endors.proof.match({
             <code>{ idempotencyKey }</code>.</li>
             <li><strong>Metered AI endpoints</strong> (<code>proof.search</code>,
             <code>proof.match</code>) are never retried and never auto-keyed — a re-sent
-            POST would double-bill credits.</li>
+            POST would double-bill credits. See the
+            <a href="/documentation/api/proof-match">Proof match API</a> for the
+            prefetch/freshness/storage patterns when using match inside user flows.</li>
             <li><strong>Typed errors</strong>: every failure throws an
             <code>EndorsError</code> with <code>code</code>, <code>status</code>,
             <code>requestId</code>, <code>retryable</code>, and (on plan gates)

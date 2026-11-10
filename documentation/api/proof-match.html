@@ -260,6 +260,76 @@
             names or pronouns.</li>
           </ul>
 
+          <h2 id="using-match-in-flows">Using match in flows: prefetch, freshness, and storage</h2>
+          <p>
+            <strong>Prefetch at data-complete, render at the moment of need.</strong>
+            A match call takes a couple of seconds (one interpretation call, one
+            embedding call) — don't make the user wait for it inside the surface.
+            Call <code>match</code> as soon as the scenario's input data is complete
+            (form submit, profile save, plan-selection intent), hold the response,
+            and render it when the user actually reaches the moment: onboarding, an
+            upgrade prompt, a cancel flow.
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">ts</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-ts">// when the profile data is complete
+const matchPromise = endors.proof.match({
+  description: `${form.industry} business, goals: ${form.goals.join(", ")}`,
+  prospect: { industry: form.industry, desiredOutcomes: form.goals },
+  eligibility: "shareable",
+  limit: 3,
+});
+
+// later, when the upsell/cancel flow renders
+const { matches, coverage } = await matchPromise;</code></pre>
+          </div>
+
+          <p>
+            Anchor the prefetch to a signal that the scenario is likely
+            (data-complete), not to page load: match
+            is a metered AI endpoint, and matching speculatively for every visitor
+            bills calls for sessions that never reach the surface. The SDK never auto-retries
+            metered AI calls; a client-side retry of a failed prefetch is a second
+            billed call — hold what you have and degrade, don't re-fire.
+          </p>
+
+          <p>
+            <strong>Treat a held result as fresh for the session.</strong> Matches
+            are scored against the workspace's proof at call time, and proof
+            changes: it gets approved, edited, or unshared. Re-match on a new
+            session or when meaningful time has passed; don't cache results
+            across days, and don't re-match on every render — match is metered,
+            and per-render calls multiply the bill for no quality gain.
+          </p>
+
+          <p>
+            <strong>If you persist matches, persist references, not content.</strong>
+          </p>
+          <ul>
+            <li><strong>Default: don't persist at all.</strong> Keep matches in
+            memory or session state for the flow's duration. A match set is
+            contextual — the same user gets different matches for onboarding vs.
+            upgrade vs. cancel, because the query context differs — so it is
+            naturally ephemeral.</li>
+            <li><strong>If you need a record</strong> (e.g. an audit of which proof
+            was shown where): store <code>proofId</code>, <code>score</code>, the
+            scenario, and a timestamp in your own database. Endors remains the
+            source of truth for the text; later edits and unsharing keep working —
+            your log stays truthful, and a stored excerpt would go stale.</li>
+            <li><strong>Anti-pattern:</strong> copying <code>excerpt</code>s as
+            durable content. That forks the canonical text and breaks revocation.</li>
+            <li>There is no proof get-by-id endpoint. If you need
+            <code>proofId</code> later, re-match — it's cheap, and the result is
+            current.</li>
+          </ul>
+
           <h2 id="errors">Errors</h2>
           <p>
             <code>400</code> invalid/empty request · <code>401</code> unauthenticated ·
@@ -313,6 +383,7 @@
           <ul class="toc-list">
             <li><a href="#request-body">Request body</a></li>
             <li><a href="#matching-rules">Matching rules</a></li>
+            <li><a href="#using-match-in-flows">Using match in flows</a></li>
             <li><a href="#errors">Errors</a></li>
           </ul>
         </aside>
