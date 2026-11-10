@@ -252,14 +252,14 @@
                 <tr>
                   <td><code>entity_type</code></td>
                   <td>string</td>
-                  <td><span class="chip chip--accent">required</span></td>
-                  <td>The record type this field applies to — currently always <code>"client"</code>.</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>The record type this field applies to — currently always <code>"client"</code>. Defaults to <code>"client"</code> when omitted.</td>
                 </tr>
                 <tr>
                   <td><code>field_type</code></td>
                   <td>string</td>
                   <td><span class="chip chip--accent">required</span></td>
-                  <td>Field type (see <a href="#supported-field-types">supported types</a> below).</td>
+                  <td>Field type (see <a href="#supported-field-types">supported types</a> below). Not validated against a fixed list — any string is stored as given; use one of the supported types so the dashboard renders it properly.</td>
                 </tr>
                 <tr>
                   <td><code>label</code></td>
@@ -277,7 +277,7 @@
                   <td><code>config</code></td>
                   <td>object</td>
                   <td>Only for types that need options</td>
-                  <td>Additional type configuration (e.g. <code>options</code> array for <code>select</code>).</td>
+                  <td>Additional type configuration (e.g. <code>options</code> array for <code>select</code>). Only needed for types that use options, by convention — it isn't enforced.</td>
                 </tr>
                 <tr>
                   <td><code>default_value</code></td>
@@ -309,7 +309,7 @@
             </table>
           </div>
 
-          <p>Response — <code>201 Created</code>:</p>
+          <p>Response — <code>200 OK</code>:</p>
 
           <div class="code-block">
             <div class="code-block-header">

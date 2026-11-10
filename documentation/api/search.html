@@ -149,7 +149,7 @@
                 <tr>
                   <td><code>limit</code></td>
                   <td>integer</td>
-                  <td>Max results. Defaults to 20, capped at 50.</td>
+                  <td>Keyword mode: max results. Defaults to 20, capped at 50. AI mode: ignored — the number of ranked picks comes from parsing the query text, and <code>results</code> carries the full judged pool.</td>
                 </tr>
                 <tr>
                   <td><code>filters</code></td>
@@ -204,11 +204,12 @@
     "results": [
       {
         "testimonial_id": "b3f2…",
-        "score": 8.7,
+        "score": 0.87,
         "match_reason": "Verified CAC reduction for a dental agency",
         "metadata": { "industry": "Dental", "timeframe": "6 months" }
       }
     ],
+    "interpreted": null,
     "answer": {
       "format": "ranked",
       "title": "Top picks",
@@ -256,8 +257,9 @@
               <span class="callout-title">Graceful degradation</span>
               <p>If an AI stage times out, results are still returned (ranked by the
               underlying search index) and <code>degraded_reason</code> explains which
-              stage failed. AI search never returns empty — with no indexed matches it
-              falls back to the 50 most recent testimonials. Videos outrank text at
+              stage failed. An empty <code>results</code> array is a normal outcome for
+              a space with no eligible proof — the answer comes back with
+              "No testimonials yet" copy. Videos outrank text at
               equal relevance.</p>
             </div>
           </div>

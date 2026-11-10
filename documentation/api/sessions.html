@@ -245,8 +245,9 @@
               message, SMS…) is your integration's job. The <code>email</code> field exists
               for <strong>dedupe</strong> (same email + template + source within 7 days →
               the existing session returns) and <strong>webhook correlation</strong>
-              (<code>session.completed</code> / <code>session.opened</code> echo it
-              verbatim) — it is never an address we message. Keeping delivery on your side
+              (<code>session.completed</code> echoes it
+              verbatim; <code>session.opened</code> does not — its payload is only
+              <code>{ sessionId, type, openedAt }</code>) — it is never an address we message. Keeping delivery on your side
               means deliverability, branding and email compliance stay entirely in your
               control.</p>
             </div>
@@ -474,8 +475,8 @@
             Session-created artifacts fire the standard webhooks as the customer moves
             through the ask — see
             <a href="/documentation/api/webhooks#events">Supported events</a>. The host's
-            correlation id (<code>sessionId</code>) and the caller's <code>metadata</code>
-            come back on every event:
+            correlation id (<code>sessionId</code>) rides on every event; the caller's
+            <code>metadata</code> comes back on <code>session.completed</code> only:
           </p>
 
           <div class="table-wrap">
@@ -486,7 +487,7 @@
               <tbody>
                 <tr><td><code>session.opened</code></td><td>The customer opens the session's artifact (every open while pending).</td></tr>
                 <tr><td><code>submission.awaiting_approval</code></td><td>A collection-session submission lands in the Reviews queue.</td></tr>
-                <tr><td><code>session.completed</code></td><td>The session's artifact receives its final submission.</td></tr>
+                <tr><td><code>session.completed</code></td><td>The session's artifact receives its final submission. Collection sessions only — a precall session has no submission flow and never completes.</td></tr>
               </tbody>
             </table>
           </div>

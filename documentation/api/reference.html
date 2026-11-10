@@ -465,7 +465,8 @@ const { ok, data } = await endors(
             of one paywall family: the response also includes a top-level
             <code>paywall</code> object your integration can inspect for plan/credit state.
             <code>AI_CREDITS_EXHAUSTED</code> is the only one at HTTP 402; the rest are 403.
-            <code>RATE_LIMITED</code> is the only retryable 4xx-family code — the
+            <code>RATE_LIMITED</code>, <code>IDEMPOTENCY_CONFLICT</code> and
+            <code>DELIVERY_FAILED</code> are the retryable 4xx-family codes — the
             <a href="/documentation/sdk/sdk">SDK</a> (and any well-behaved integration)
             should honor <code>retryAfter</code> and retry.
           </p>
@@ -545,8 +546,10 @@ if not resp.ok:
           <p>
             The init command detects your project (Next.js, React, or plain HTML), asks
             for your embedding id (from <strong>Embeds → your wall → Embed id</strong>
-            in the dashboard), installs <code>@endors/widgets</code>, and drops in a
-            working example component that mounts the wall:
+            in the dashboard), writes the config and a working example component that
+            mounts the wall, and prints the
+            <code>npm install @endors/widgets</code> command as your next step — it
+            doesn't install anything itself:
           </p>
 
           <div class="code-block">

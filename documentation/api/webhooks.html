@@ -274,8 +274,8 @@
             <strong>delivery</strong>. Returns the 20 most recent deliveries for a
             webhook. This log is queryable on purpose: if your endpoint goes down, poll
             it to see exactly which events were attempted while you were offline, then
-            re-send the ones you want (<a href="#retries">retry is dashboard-only</a>;
-            the API returns the log either way). Delivery records are retained for your
+            re-send the ones you want (<a href="#retries">retry accepts a Bearer API
+            key</a>; the API returns the log either way). Delivery records are retained for your
             webhook's lifetime — they are not deleted when you reconnect.
           </p>
 
@@ -370,8 +370,8 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID/deliveries?
 
           <p>
             Manually retrying a single delivery (<code>POST
-            /webhooks/{webhookId}/deliveries/{deliveryId}/retry</code>) requires a
-            browser session — it does not accept a Bearer API key. It returns
+            /webhooks/{webhookId}/deliveries/{deliveryId}/retry</code>) accepts a
+            Bearer API key. It returns
             <code>{ "ok": true, "status": "success" }</code> (or
             <code>"failed"</code>).
           </p>

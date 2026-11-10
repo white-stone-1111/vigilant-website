@@ -226,7 +226,7 @@
                 </tr>
                 <tr>
                   <td><code>destinations</code></td>
-                  <td>object</td>
+                  <td>string[]</td>
                   <td><span class="chip">optional</span></td>
                   <td>After-submission redirect configuration. External redirects require the plan feature <code>externalRedirects</code>.</td>
                 </tr>
@@ -273,7 +273,9 @@
               <span class="callout-title">Plan gates</span>
               <p>Link count is capped per plan (<code>403 PLAN_RESTRICTION</code> when
               exhausted) and external redirects require the
-              <code>externalRedirects</code> feature. Everything else behaves like the
+              <code>externalRedirects</code> feature. On this endpoint the
+              <code>403</code> is the plain error envelope — it does not carry a
+              <code>paywall</code> object. Everything else behaves like the
               dashboard's link builder.</p>
             </div>
           </div>

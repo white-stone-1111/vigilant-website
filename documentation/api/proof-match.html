@@ -129,7 +129,11 @@
                 Deterministic per request: at most one LLM interpretation call and one
                 embedding call, both degrading gracefully. An empty <code>matches</code>
                 array with a <code>coverage</code> object is a normal "no match"
-                result, not an error.
+                result, not an error. <code>shareUrl</code> can be null — every
+                match still carries a <code>url</code> fallback — and a failed AI
+                stage degrades gracefully: the response includes a
+                <code>degraded</code> object describing the shortfall rather than
+                erroring.
               </p>
             </div>
           </div>
@@ -160,12 +164,12 @@
                 <tr>
                   <td><code>eligibility</code></td>
                   <td>string</td>
-                  <td><code>shareable</code> (default) — only approved, shareable proof; or <code>library</code> for everything.</td>
+                  <td><code>shareable</code> (default) — only approved, shareable proof; or <code>library</code> for everything except deleted and not-approved proof.</td>
                 </tr>
                 <tr>
                   <td><code>limit</code></td>
                   <td>integer</td>
-                  <td>Max matches. Defaults to 5, capped at 20.</td>
+                  <td>Max matches. Defaults to 5; a value above 20 is rejected with <code>400 BAD_REQUEST</code>.</td>
                 </tr>
                 <tr>
                   <td><code>includeScoreBreakdown</code></td>
@@ -255,16 +259,20 @@
             a mismatch adds nothing. <code>filters.gender</code> is a hard filter —
             only testimonials whose client gender matches (after a synonym layer:
             <em>woman/female/she</em> → <code>female</code>,
-            <em>man/male/he</em> → <code>male</code>) are returned. The deterministic
-            engine matches only the stored client field; it never infers gender from
-            names or pronouns.</li>
+            <em>man/male/he</em> → <code>male</code>) are returned. The engine
+            matches the stored client field when it is set; when the field is
+            empty it falls back to a deterministic first-name inference (the
+            response marks such matches <code>genderInferred: true</code>) — it
+            never reads pronouns or free-text. For the hard
+            <code>filters.gender</code>, clients whose gender can't be resolved
+            either way are excluded.</li>
           </ul>
 
           <h2 id="using-match-in-flows">Using match in flows: prefetch, freshness, and storage</h2>
           <p>
             <strong>Prefetch at data-complete, render at the moment of need.</strong>
-            A match call is an LLM round-trip plus an embedding round-trip:
-            typically a few seconds, but allow up to ~20 seconds worst case.
+            A match call is an LLM round-trip plus an embedding round-trip —
+            typically a few seconds, allow up to ~20 seconds worst case.
             Never make the user wait for it inline. Call
             <code>match</code> as soon as the scenario's input data is complete
             (form submit, profile save, plan-selection intent), hold the response,
@@ -327,19 +335,25 @@ const { matches, coverage } = await matchPromise;</code></pre>
             <li><strong>Anti-pattern:</strong> copying <code>excerpt</code>s as
             durable content. That forks the canonical text and breaks revocation.</li>
             <li><code>proofId</code> is the Endors testimonial id. To re-hydrate
-            a stored set later, fetch by id through the Testimonials API —
-            <code>GET /testimonials/{id}</code> for one, or
-            <code>testimonials?id=a,b,c</code> to hydrate a whole stored set in
-            one call — and render only rows whose status is still approved. That
-            returns the current content (edits, unshares, and deletions are all
-            visible), which is why storing ids beats storing excerpts.</li>
+            a stored set later, fetch each id through the Testimonials API —
+            <code>GET /testimonials/{id}?shareLink=1</code> — and render only
+            rows with <code>share_enabled: true</code>. That returns the current
+            content (edits and deletions are visible; an unshared testimonial
+            reports <code>share_enabled: false</code>), which is why storing ids
+            beats storing excerpts. The list endpoint's <code>id</code>
+            parameter matches one exact id, not a list — hydrate a set of N
+            matches with N cheap, unmetered GETs (typical match limits are
+            ≤ 5).</li>
           </ul>
 
           <h2 id="errors">Errors</h2>
           <p>
             <code>400</code> invalid/empty request · <code>401</code> unauthenticated ·
-            <code>403</code> not a member · <code>500</code> unexpected internal
-            failure. An empty <code>matches</code> array with <code>coverage</code> is
+            <code>403</code> not a member, or <code>PLAN_RESTRICTION</code> for
+            Bearer callers on a plan without API access · <code>429</code>
+            <code>RATE_LIMITED</code> — the 20 requests/minute AI tier applies ·
+            <code>500</code> unexpected internal failure. An empty
+            <code>matches</code> array with <code>coverage</code> is
             a successful response — design your fallback copy for it.
           </p>
 

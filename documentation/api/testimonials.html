@@ -120,7 +120,7 @@
               <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/testimonials</code>
             </div>
             <div class="endpoint-body">
-              <p>Lists all non-deleted testimonials, newest first. Supports filters and response extras via query parameters.</p>
+              <p>Lists non-deleted testimonials, newest first — up to the default limit of 200 per page. Supports filters and response extras via query parameters.</p>
             </div>
           </div>
 
@@ -151,7 +151,7 @@
                 <tr>
                   <td><code>limit</code></td>
                   <td>integer</td>
-                  <td>Page size. Defaults to <code>200</code>, capped at <code>500</code>. Only meaningful together with <code>cursor</code>.</td>
+                  <td>Page size. Defaults to <code>200</code>, capped at <code>500</code>. Caps the page with or without a cursor.</td>
                 </tr>
                 <tr>
                   <td><code>cursor</code></td>
@@ -172,6 +172,16 @@
                   <td><code>skipUrls</code></td>
                   <td><code>1</code></td>
                   <td>Skip URL generation for lighter responses.</td>
+                </tr>
+                <tr>
+                  <td><code>clientId</code></td>
+                  <td>string</td>
+                  <td>Only testimonials linked to this client.</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td>string</td>
+                  <td>Filter by status (e.g. <code>approved</code>).</td>
                 </tr>
               </tbody>
             </table>
@@ -210,7 +220,7 @@
       "type": "text",
       "name": "Sarah Mitchell",
       "text_content": "They cut our CAC nearly in half in six months.",
-      "rating": 5,
+      "rating": 8,
       "status": "approved",
       "client_id": "7a1e…",
       "clients": {
@@ -251,11 +261,14 @@
                 <span>Copy</span>
               </button>
             </div>
-            <pre><code class="language-bash"># first page
+            <pre><code class="language-bash"># plain list — limit caps the page; no cursor passed, so no nextCursor
 curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100" \
   -H "Authorization: Bearer $ENDORS_API_KEY"
 
-# → { "ok": true, "data": [ … 100 rows … ], "nextCursor": "eyJ2Ijoi…" }
+# → { "ok": true, "data": [ … 100 rows … ] }
+
+# opt in to pagination — pass a cursor to start keyset paging;
+# the response carries nextCursor when the page filled
 
 # next page — echo the cursor back
 curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;cursor=eyJ2Ijoi…" \
@@ -270,7 +283,9 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
             twice or skip one. The cursor is opaque: treat it as a string, don't parse
             or construct it. Malformed input returns <code>400 INVALID_LIMIT</code> or
             <code>400 INVALID_CURSOR</code> with a <code>field</code> naming the
-            offending parameter.
+            offending parameter. <code>INVALID_LIMIT</code> only fires when a cursor
+            was passed; a malformed limit on a cursor-less request is silently coerced
+            to the default.
           </p>
 
           <h2 id="create-testimonial">Create a testimonial</h2>
@@ -325,7 +340,7 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
                   <td><code>name</code>, <code>rating</code>, <code>source_created_at</code></td>
                   <td>mixed</td>
                   <td><span class="chip">optional</span></td>
-                  <td>Display name, 1–5 rating, and a back-dated creation timestamp.</td>
+                  <td>Display name, 1–10 rating, and a back-dated creation timestamp.</td>
                 </tr>
                 <tr>
                   <td><code>client_id</code></td>
@@ -363,7 +378,7 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
   -d '{
     "type": "text",
     "text_content": "Working with them doubled our demo book rate.",
-    "rating": 5,
+    "rating": 8,
     "name": "Sarah Mitchell",
     "client_first_name": "Sarah",
     "client_last_name": "Mitchell",
@@ -390,6 +405,10 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
     "shareUrl": "https://app.endors.io/share/ab12cd34ef"
   }
 }</code></pre>
+            <p>
+              For an unlinked testimonial <code>clientId</code> is omitted, not
+              null. <code>shareUrl</code> can be null.
+            </p>
           </div>
 
           <div class="callout callout--note">
@@ -459,7 +478,7 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
                     <tr>
                       <td><code>text_content</code>, <code>rating</code>, <code>status</code>, <code>body</code>, <code>author_name</code>, <code>author_title</code></td>
                       <td>mixed</td>
-                      <td>Editable fields. <code>status</code> is <code>pending</code> / <code>approved</code> / <code>rejected</code>.</td>
+                      <td>Editable fields. <code>status</code> is <code>unreviewed</code> / <code>pending_review</code> / <code>approved</code> / <code>not_approved</code> — any other value is rejected by the database check.</td>
                     </tr>
                     <tr>
                       <td><code>add_folder_ids</code></td>

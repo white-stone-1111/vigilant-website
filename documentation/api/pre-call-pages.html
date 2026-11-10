@@ -209,9 +209,11 @@
             of a final stage — switch on <code>code</code>, show <code>message</code>
             to the user. Documented codes: <code>no_prospect_data</code> (CRM
             enrichment returned nothing usable), <code>template_invalid</code> (the
-            template — explicit or workspace default — isn't usable) and
+            template — explicit or workspace default — isn't usable),
             <code>persist_failed</code> (the page was generated but couldn't be saved;
-            credits are refunded).
+            credits are refunded), <code>invalid_url</code>, <code>unavailable</code>
+            and <code>not_found</code> (CRM webhook failures) and
+            <code>PLAN_RESTRICTION</code>.
           </p>
 
           <div class="callout callout--warning">
@@ -221,8 +223,10 @@
             <div>
               <span class="callout-title">Generation draws AI credits</span>
               <p>Each generation meters <strong>2 AI credits</strong> from the space's
-              balance. An empty balance returns <code>402 AI_CREDITS_EXHAUSTED</code>
-              with a <code>paywall</code> payload — retrying the same request cannot
+              balance. An empty balance arrives as an in-stream error event over
+              HTTP 200 (<code>{"t":"error","code":"AI_CREDITS_EXHAUSTED",…}</code>)
+              — the credit check happens after the stream opens, so you never get
+              an HTTP 402 here. Retrying the same request cannot
               succeed until credits are topped up. Failed generations are refunded.</p>
             </div>
           </div>
