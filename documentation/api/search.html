@@ -177,7 +177,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/search" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "dental agency that cut CAC",
@@ -238,7 +238,11 @@
             In AI mode with the default <code>stream: true</code>, the response is an
             NDJSON stream (<code>Content-Type: application/x-ndjson</code>) of
             <code>meta</code> → <code>title</code>/<code>item</code>… →
-            <code>answer</code> → <code>end</code> events. Keyword mode ignores
+            <code>answer</code> → <code>end</code> events. Every line is a JSON object
+            with a discriminator field <code>t</code> (<code>{"t":"meta",…}</code>,
+            <code>{"t":"item",…}</code>, <code>{"t":"answer",…}</code>,
+            <code>{"t":"end",…}</code>) — read line by line and switch on
+            <code>t</code>. Keyword mode ignores
             <code>stream</code> and always returns one JSON object. For API-key
             callers, prefer <code>stream: false</code> — the content is identical, just
             delivered in one body.

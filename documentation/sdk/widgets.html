@@ -138,6 +138,19 @@
 mount(document.getElementById("wall"), { embedId: "your-embedding-id" });</code></pre>
           </div>
 
+          <p>Two helpers cover the other common shapes:</p>
+          <ul>
+            <li><code>mountAt(selector, options)</code> — mount into a CSS selector,
+            e.g. <code>mountAt("#reviews", { embedId })</code>.</li>
+            <li><code>mountAll()</code> — mount every
+            <code>[data-endors-embed-id]</code> container on the page (embedId comes
+            from each container's attribute; other options pass through). It reads
+            <code>data-endors-embed-id</code> and <code>data-embed-height</code> only —
+            the <code>data-endors-match</code> attribute is the copy-paste snippet's
+            feature, so for matched walls via the SDK pass <code>match</code> in
+            options or use <code>mount</code>.</li>
+          </ul>
+
           <p>
             For React apps, use the wrapper subpath (React is a peer dependency you already
             have):
@@ -153,11 +166,14 @@ mount(document.getElementById("wall"), { embedId: "your-embedding-id" });</code>
             </div>
             <pre><code class="language-ts">import { EndorsEmbed } from "@endors/widgets/react";
 
-&lt;EndorsEmbed embedId={id} className="my-wall" onMountError={(err) =&gt; console.error(err.code)} /&gt;</code></pre>
+&lt;EndorsEmbed embedId={id} className="my-wall" match={formData.education} onMountError={(err) =&gt; console.error(err.code)} /&gt;</code></pre>
           </div>
 
           <p>
-            StrictMode-safe and unmount-safe; sync mount failures surface through
+            Props: <code>embedId</code>, <code>baseUrl</code>, <code>height</code>,
+            <code>match</code>, <code>timeoutMs</code>, <code>className</code>,
+            <code>style</code>, <code>onMountError</code>. StrictMode-safe and
+            unmount-safe; sync mount failures surface through
             <code>onMountError</code> instead of throwing during render, and a
             <code>timeoutMs</code> watchdog is caught by the component for you. The wall
             loads the same live embed document as the copy-paste snippet, auto-resizes, and

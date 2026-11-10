@@ -142,7 +142,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <h2 id="pagination-optional">Pagination (optional)</h2>
@@ -160,7 +160,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients?limit=100" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <p>When the list filled the page, the response includes a <code>nextCursor</code> field:</p>
@@ -191,7 +191,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients?limit=100&amp;cursor=eyJ2Ijoi..." \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <p>
@@ -290,7 +290,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/clients" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Sarah",

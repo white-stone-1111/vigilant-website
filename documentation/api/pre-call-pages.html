@@ -174,7 +174,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl -N -X POST "https://app.endors.io/api/spaces/$SPACE_ID/pre-call-pages/generate" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "prospectName": "Jane Cooper",
@@ -205,11 +205,13 @@
           </div>
 
           <p>
-            A <code>{"t":"error"}</code> line can appear instead of a final stage —
-            codes include <code>no_prospect_data</code> (CRM enrichment returned
-            nothing usable), <code>template_invalid</code> (the template — explicit or
-            workspace default — isn't usable) and <code>persist_failed</code> (the
-            page was generated but couldn't be saved; credits are refunded).
+            A <code>{"t":"error","code":…,"message":…}</code> line can appear instead
+            of a final stage — switch on <code>code</code>, show <code>message</code>
+            to the user. Documented codes: <code>no_prospect_data</code> (CRM
+            enrichment returned nothing usable), <code>template_invalid</code> (the
+            template — explicit or workspace default — isn't usable) and
+            <code>persist_failed</code> (the page was generated but couldn't be saved;
+            credits are refunded).
           </p>
 
           <div class="callout callout--warning">
@@ -232,8 +234,10 @@
             <div>
               <span class="callout-title">Idempotent within 10 minutes</span>
               <p>A repeat call for the same prospect email within 10 minutes returns
-              the existing page with <code>existing: true</code> and its URL instead of
-              generating a duplicate — and burning a second credit.</p>
+              the existing page instead of generating a duplicate — and burning a
+              second credit: the <code>complete</code> stage event arrives with
+              <code>existing: true</code> alongside its <code>url</code> and
+              <code>pageId</code>.</p>
             </div>
           </div>
 

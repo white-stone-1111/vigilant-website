@@ -153,7 +153,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/assets/upload" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -F "type=image" \
   -F "file=@headshot.jpg"
 
@@ -217,7 +217,7 @@
             </div>
             <pre><code class="language-bash"># 1. create the upload
 curl -X POST "https://app.endors.io/api/video/create-upload" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "spaceId": "'"$SPACE_ID"'", "filename": "demo.mp4" }'
 # → { "uploadUrl": "https://upload.cloudflarestream.com/…", "assetId": "a-7c1…", "streamUid": "…" }
@@ -227,7 +227,7 @@ curl -X POST "$UPLOAD_URL" --data-binary @demo.mp4
 
 # 3. poll until ready
 curl "https://app.endors.io/api/video/status?assetId=$ASSET_ID" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"
+  -H "Authorization: Bearer $ENDORS_API_KEY"
 # → { "assetId": "a-7c1…", "status": "ready", "embedUrl": "…", "hlsUrl": "…",
 #     "posterUrl": "…", "durationSeconds": 84, "aspectRatio": "16:9" }</code></pre>
           </div>

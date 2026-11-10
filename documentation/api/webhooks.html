@@ -134,7 +134,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/webhooks" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Production webhook",
@@ -216,7 +216,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl -X PATCH "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"active": false}'</code></pre>
               </div>
@@ -301,11 +301,11 @@
             </div>
             <pre><code class="language-bash"># All recent deliveries
 curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID/deliveries" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"
+  -H "Authorization: Bearer $ENDORS_API_KEY"
 
 # Only deliveries that failed while your endpoint was down
 curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID/deliveries?status=exhausted" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <div class="code-block">

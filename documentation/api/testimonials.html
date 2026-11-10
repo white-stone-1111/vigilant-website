@@ -189,7 +189,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?shareLinks=1&amp;limit=50" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
               </div>
             </div>
             <div>
@@ -253,13 +253,13 @@
             </div>
             <pre><code class="language-bash"># first page
 curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"
+  -H "Authorization: Bearer $ENDORS_API_KEY"
 
 # → { "ok": true, "data": [ … 100 rows … ], "nextCursor": "eyJ2Ijoi…" }
 
 # next page — echo the cursor back
 curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;cursor=eyJ2Ijoi…" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <p>
@@ -358,7 +358,7 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
               </button>
             </div>
             <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/testimonials" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "type": "text",
@@ -500,7 +500,7 @@ curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;curs
               </button>
             </div>
             <pre><code class="language-bash">curl -X PATCH "https://app.endors.io/api/spaces/$SPACE_ID/testimonials/$T_ID" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "add_folder_ids": ["9c4e…"],

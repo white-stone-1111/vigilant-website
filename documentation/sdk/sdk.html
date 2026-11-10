@@ -109,7 +109,9 @@
           <h1>@endors/sdk (Node)</h1>
           <p class="page-lede">
             The official Node SDK wraps the REST API in a typed, zero-dependency client —
-            full TypeScript types, no dependencies, server-side only (Node ≥ 18). Every
+            full TypeScript types, no dependencies, server-side only (Node ≥ 18).
+            <strong>ESM-only</strong>: <code>import</code> works, <code>require()</code>
+            does not — under CJS, load it with dynamic <code>import()</code>. Every
             path is space-scoped automatically, so you never compose URLs.
           </p>
           <p>
@@ -319,24 +321,31 @@ const match = await endors.proof.match({
                 <span>Copy</span>
               </button>
             </div>
-            <pre><code class="language-ts">import { verifyWebhook } from "@endors/sdk/webhooks";
+            <pre><code class="language-ts">import { verifyWebhookSignature } from "@endors/sdk";
 
-app.post("/webhooks/endors", express.raw({ type: "application/json" }), (req, res) =&gt; {
-  const result = verifyWebhook(req.body, req.headers, process.env.ENDORS_WEBHOOK_SECRET);
-  if (!result.ok) return res.status(401).send(result.reason);
-
-  const payload = JSON.parse(req.body);
-  if (payload.event === "session.completed") {
-    // …
+app.post("/webhooks/endors", express.raw({ type: "application/json" }), async (req, res) =&gt; {
+  try {
+    const payload = await verifyWebhookSignature(req.body, req.headers, {
+      secret: process.env.ENDORS_WEBHOOK_SECRET,
+    });
+    if (payload.event === "session.completed") {
+      // …payload is typed per event — narrow on payload.event
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400).send(err instanceof Error ? err.message : "invalid signature");
   }
-  res.sendStatus(200);
 });</code></pre>
           </div>
 
           <p>
-            The full scheme — headers, replay protection, and the cutover timeline — is
-            documented in the <a href="/documentation/api/webhooks#verifying">Webhooks API</a>
-            page.
+            Pass the raw, unparsed body — <code>express.raw()</code> gives a Buffer,
+            which passes directly. On success the verifier resolves to the typed
+            payload (narrow on <code>payload.event</code>); on failure it throws
+            <code>SignatureVerificationError</code> with the reason — return a 400, not
+            a 500. The full scheme — headers, replay protection, and the cutover
+            timeline — is documented in the
+            <a href="/documentation/api/webhooks#verifying">Webhooks API</a> page.
           </p>
 
           <hr>

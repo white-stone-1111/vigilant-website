@@ -136,7 +136,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <div class="table-wrap">
@@ -225,7 +225,7 @@
               </button>
             </div>
             <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Industry",
@@ -344,25 +344,25 @@
             </div>
             <pre><code class="language-bash"># Text field
 curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "LinkedIn URL", "entity_type": "client", "field_type": "text"}'
 
 # Number field
 curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "NPS Score", "entity_type": "client", "field_type": "number"}'
 
 # Date field
 curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "Contract Start Date", "entity_type": "client", "field_type": "date"}'
 
 # Select field
 curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "Plan Tier", "entity_type": "client", "field_type": "select", "config": {"options": ["Free", "Pro", "Enterprise"]}}'</code></pre>
           </div>
@@ -417,7 +417,7 @@ curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields" \
               </button>
             </div>
             <pre><code class="language-bash">curl -X DELETE "https://app.endors.io/api/spaces/$SPACE_ID/custom-fields/$FIELD_ID?confirm=true" \
-  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+  -H "Authorization: Bearer $ENDORS_API_KEY"</code></pre>
           </div>
 
           <p>

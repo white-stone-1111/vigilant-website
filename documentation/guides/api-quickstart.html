@@ -148,7 +148,7 @@
                   </button>
                 </div>
                 <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/sessions" \
-  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "type": "collection",
@@ -192,13 +192,30 @@
             </div>
             <div class="step">
               <p class="step-title">4. Receive <code>session.completed</code></p>
-              <p>Register a webhook (the
-              <a href="/documentation/api/webhooks#create-a-webhook">Webhooks API page</a>,
-              "Create a webhook") subscribed to <code>session.completed</code>, and you
-              have the full round trip: your code created an ask, your customer completed
-              it, your server knows it happened — correlated by <code>sessionId</code>,
-              <code>email</code> and the <code>metadata</code> you passed at
-              creation:</p>
+              <p>Register a webhook endpoint subscribed to <code>session.completed</code>
+              (you can also create one in the dashboard under <strong>Settings → API
+              &amp; Webhooks</strong>):</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-title">step-4.sh</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/webhooks" \
+  -H "Authorization: Bearer $ENDORS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://your-server.com/webhooks/endors",
+    "events": ["session.completed"],
+    "secret": "your-signing-secret-at-least-16-chars"
+  }'</code></pre>
+              </div>
+              <p>Then you have the full round trip: your code created an ask, your
+              customer completed it, your server knows it happened — correlated by
+              <code>sessionId</code>, <code>email</code> and the
+              <code>metadata</code> you passed at creation:</p>
               <div class="code-block">
                 <div class="code-block-header">
                   <span class="code-lang">json</span>
