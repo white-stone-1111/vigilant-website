@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipes | Endors Documentation</title>
+  <meta name="description" content="Endors integration recipes indexed by trigger — post-payment asks, pre-call pages on autopilot, onboarding proof, live social-proof badges and completion reactions.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/documentation/docs.css">
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("endors-docs-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="docs-layout">
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-header">
+        <a class="sidebar-logo" href="/documentation/">endors</a>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Search docs" aria-label="Search docs">
+          <kbd>/</kbd>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Documentation">
+        <div class="nav-section">
+          <p class="nav-section-title">Getting started</p>
+          <a class="nav-item" href="/documentation/">Introduction</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes" aria-current="page">Recipes</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">API reference</p>
+          <a class="nav-item" href="/documentation/api/reference">API overview</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-note">endors.io</span>
+        <button class="theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ============ Mobile topbar ============ -->
+    <header class="docs-topbar">
+      <button class="sidebar-open-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="sidebar-logo" href="/documentation/">endors</a>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="docs-main">
+      <div class="docs-wrap">
+
+        <article class="docs-content">
+
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/documentation/">Docs</a>
+            <span class="sep">/</span>
+            <a href="/documentation/">Guides</a>
+            <span class="sep">/</span>
+            <span aria-current="page">Recipes</span>
+          </nav>
+
+          <h1>Recipes</h1>
+          <p class="page-lede">
+            Recipes are indexed by the <strong>trigger you already have</strong>, not by
+            endpoint. Each one is: one trigger + one Endors capability + a few lines of
+            your code. The integration patterns below are tested against the live
+            endpoints; where a recipe touches another product (Stripe, Calendly, Slack),
+            that product's own docs cover its side — ours covers the Endors half.
+          </p>
+
+          <h2 id="index-by-trigger">Index by trigger</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Trigger</th><th>Recipe</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>A customer paid</td><td><a href="#recipe-1--post-payment-ask">Post-payment ask</a></td></tr>
+                <tr><td>A meeting got booked</td><td><a href="#recipe-8--pre-call-page-on-autopilot">Pre-call page on autopilot</a></td></tr>
+                <tr><td>A new user signed up</td><td><a href="#recipe-9--onboarding-proof">Onboarding proof</a></td></tr>
+                <tr><td>I want social proof on a page</td><td><a href="#recipe-19--live-social-proof-badge">Live social-proof badge</a></td></tr>
+                <tr><td>A customer completed an ask</td><td><a href="#recipe-25--react-to-completion">React to completion</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="recipe-1--post-payment-ask">Recipe 1 — Post-payment ask</h2>
+          <p>
+            <strong>Trigger:</strong> a successful checkout in your system (Stripe, Paddle,
+            your own billing).<br>
+            <strong>Capability:</strong> <a href="/documentation/api/sessions#create-a-session"><code>POST /sessions</code></a>.<br>
+            <strong>Scenario:</strong> the moment a customer pays is the moment they're
+            happiest — ask for the testimonial then.
+          </p>
+          <p>In your payment webhook handler (server-side — never expose your key in the browser):</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">// inside your checkout.completed handler
+await fetch(`https://app.endors.io/api/spaces/${SPACE_ID}/sessions`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.ENDORS_API_KEY}`,
+    "Content-Type": "application/json",
+    // protects against the double-fired webhook (the classic first-integration bug)
+    "Idempotency-Key": `checkout-${event.id}`,
+  },
+  body: JSON.stringify({
+    type: "collection",
+    customerName: customer.name,
+    email: customer.email,
+    source: "stripe-checkout",
+    context: "Thanks for upgrading to Pro! Would you share what convinced you?",
+    metadata: { stripeCustomerId: customer.id },
+  }),
+});
+// → { ok, data: { id, url, status: "pending", … } }</code></pre>
+          </div>
+
+          <p>
+            Then deliver <code>data.url</code> however you already talk to this customer
+            (your receipt email, in-app message, etc.). Endors never sends email on your
+            behalf — the <code>email</code> field is for dedupe + webhook correlation only.
+          </p>
+          <p>Two behaviors do the worrying for you:</p>
+          <ul>
+            <li><strong>Retries are safe.</strong> The same <code>Idempotency-Key</code>
+            returns the original response verbatim; a <em>different</em> body with a used
+            key is <code>409 IDEMPOTENCY_REPLAY_MISMATCH</code> (your bug — don't
+            retry).</li>
+            <li><strong>Double triggers are safe even without idempotency.</strong> The
+            same email + source within 7 days returns the existing session with
+            <code>deduplicated: true</code> (HTTP 200) instead of spamming your customer
+            with a second ask. A genuine second ask: <code>force: true</code> or a
+            different <code>source</code>.</li>
+          </ul>
+
+          <h2 id="recipe-8--pre-call-page-on-autopilot">Recipe 8 — Pre-call page on autopilot</h2>
+          <p>
+            <strong>Trigger:</strong> a meeting gets booked (Calendly webhook, CRM deal
+            stage change).<br>
+            <strong>Capability:</strong>
+            <a href="/documentation/api/sessions#create-a-session"><code>POST /sessions</code></a>
+            with <code>type: "precall"</code>.<br>
+            <strong>Scenario:</strong> your sales team walks into every call with a brief
+            built from your proof library.
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">await fetch(`https://app.endors.io/api/spaces/${SPACE_ID}/sessions`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.ENDORS_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    type: "precall",
+    customerName: "Dana Lee",
+    email: "dana@example.com",
+    templateId: "tpl_your_pre_call_template", // omit for the space default
+    context: "Head of Ops at a 40-person logistics company, evaluating after a demo, concerned about onboarding time",
+    source: "calendly-booked",
+  }),
+});</code></pre>
+          </div>
+
+          <p>
+            <code>context</code> is <strong>required</strong> for precall sessions — it's
+            what the pre-call generation works from; the more specific it is, the sharper
+            the brief. Note the two details that make this zero-maintenance: the response
+            is the same <code>{ id, url, status }</code> shape as every other session, and
+            precall sessions draw AI credits — an exhausted balance returns
+            <code>402 AI_CREDITS_EXHAUSTED</code> with a <code>paywall</code> payload
+            rather than a silent failure. Give the generated page's <code>url</code> to
+            the rep (or email it to the customer).
+          </p>
+
+          <h2 id="recipe-9--onboarding-proof">Recipe 9 — Onboarding proof</h2>
+          <p>
+            <strong>Trigger:</strong> a user reaches the part of your product where a claim
+            needs backing ("companies like yours…").<br>
+            <strong>Capability:</strong>
+            <a href="/documentation/api/proof-match"><code>POST /proof/match</code></a> —
+            the grounded, scored, cited proof query.<br>
+            <strong>Scenario:</strong> pull the strongest relevant testimonial for
+            <em>this</em> user's situation, with reasons you can defend.
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">const res = await fetch(`https://app.endors.io/api/spaces/${SPACE_ID}/proof/match`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.ENDORS_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    description: "Logistics company, ~40 employees, worried about switching costs",
+    filters: { hasQuantitativeResult: true },
+    limit: 3,
+  }),
+});
+const { data } = await res.json();
+// data.matches[0] → { excerpt, score, reasons: [{ code, label, sourceId }], shareUrl }</code></pre>
+          </div>
+
+          <p>
+            Every match carries <code>reasons</code> — machine-checkable citations ("Same
+            industry: Logistics", "Verified onboarding time: 3 weeks → 9 days") pointing at
+            stored metadata, never invented. Render the <code>excerpt</code> with its
+            <code>shareUrl</code>; hide the machinery. An empty <code>matches</code> array
+            is a normal answer, not an error — have a neutral fallback copy for it.
+            AI-tier rate limit: 20 requests/minute per key.
+          </p>
+
+          <h2 id="recipe-19--live-social-proof-badge">Recipe 19 — Live social-proof badge</h2>
+          <p>
+            <strong>Trigger:</strong> any page load where social proof helps (signup,
+            pricing, landing).<br>
+            <strong>Capability:</strong> <code>GET /proof/stats</code> — one call for live
+            badge numbers (the full response shape is in the sample below).<br>
+            <strong>Scenario:</strong> a real, live counter instead of a hardcoded one.
+          </p>
+          <p>
+            Server-side (or a light edge function), then cache on your side — the endpoint
+            itself serves from a 60-second cache and reports <code>cached:
+            true/false</code>, but your page shouldn't call it per visitor at all:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">// fetch at most once a minute, cache the rest
+const res = await fetch(`https://app.endors.io/api/spaces/${SPACE_ID}/proof/stats`, {
+  headers: { Authorization: `Bearer ${process.env.ENDORS_API_KEY}` },
+});
+const { data } = await res.json();
+// data → { totalTestimonials: 142, avgRating: 4.8, videoCount: 38,
+//          imageCount: 21, textCount: 83, documentCount: 0, clientCount: 96 }</code></pre>
+          </div>
+
+          <p>
+            Render <code>data.clientCount</code> as "Trusted by 96 companies" and
+            <code>data.totalTestimonials</code> as "— 142 verified stories".
+            <code>avgRating</code> is <code>null</code> when no ratings exist — branch on
+            that.
+          </p>
+
+          <h2 id="recipe-25--react-to-completion">Recipe 25 — React to completion</h2>
+          <p>
+            <strong>Trigger:</strong> a customer completes an ask.<br>
+            <strong>Capability:</strong> the
+            <a href="/documentation/api/webhooks#sessioncompleted"><code>session.completed</code></a>
+            webhook + the <code>metadata</code> you stored at creation.<br>
+            <strong>Scenario:</strong> the completion is the trigger for your next
+            workflow — unlock a perk, ping Slack, update the CRM.
+          </p>
+          <p>
+            Create the session with whatever correlation data you need
+            (<a href="#recipe-1--post-payment-ask">Recipe 1</a>), then react when it comes
+            back:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">app.post("/webhooks/endors", (req, res) =&gt; {
+  // verify the signature first — see "Verifying webhook signatures"
+  if (req.body.event === "session.completed") {
+    const { sessionId, source } = req.body;           // top-level context fields
+    const { email, metadata, customerName } = req.body.data;  // echoed verbatim
+
+    // metadata is YOUR payload from creation time:
+    slack.post(`🎉 ${customerName} (${email}) completed a testimonial — source: ${source}`);
+    crm.update(metadata.stripeCustomerId, { testimonial_collected: true });
+  }
+  res.sendStatus(200); // ack within 10s; process async if slow
+});</code></pre>
+          </div>
+
+          <p>
+            <code>sessionId</code> and <code>source</code> ride at the top level of every
+            session payload and are also in <code>data</code>. Your handler must return a
+            <code>2xx</code> within 10 seconds — acknowledge first, process in a queue.
+            Failures retry automatically (immediately, 2s, 8s, 32s, 128s); a 4xx marks the
+            delivery exhausted with no retry.
+          </p>
+
+          <div class="callout callout--tip">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.6 1 1.5 1 2.5h6c0-1 .3-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Related: the reminder workflow</span>
+              <p>Sessions pending for too long are recoverable —
+              <a href="/documentation/api/sessions#list-sessions">list sessions</a>
+              filtered by <code>status=pending&amp;createdAfter=…</code> and re-send the
+              <code>url</code>.</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Previous / Next -->
+          <nav class="pager" aria-label="Pagination">
+            <a class="pager-link" href="/documentation/guides/api-quickstart">
+              <span class="pager-dir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+                Previous
+              </span>
+              <span class="pager-title">API quickstart</span>
+            </a>
+            <a class="pager-link pager-link--next" href="/documentation/api/reference">
+              <span class="pager-dir">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+              <span class="pager-title">API overview</span>
+            </a>
+          </nav>
+
+          <footer class="docs-page-footer">
+            <span>Last updated Nov 2026</span>
+            <a href="/documentation/">Back to endors.io</a>
+          </footer>
+
+        </article>
+
+        <!-- ============ On this page ============ -->
+        <aside class="docs-toc">
+          <p class="toc-title">On this page</p>
+          <ul class="toc-list">
+            <li><a href="#index-by-trigger">Index by trigger</a></li>
+            <li><a href="#recipe-1--post-payment-ask">Recipe 1 — Post-payment ask</a></li>
+            <li><a href="#recipe-8--pre-call-page-on-autopilot">Recipe 8 — Pre-call page on autopilot</a></li>
+            <li><a href="#recipe-9--onboarding-proof">Recipe 9 — Onboarding proof</a></li>
+            <li><a href="#recipe-19--live-social-proof-badge">Recipe 19 — Live social-proof badge</a></li>
+            <li><a href="#recipe-25--react-to-completion">Recipe 25 — React to completion</a></li>
+          </ul>
+        </aside>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/documentation/docs.js" defer></script>
+</body>
+</html>

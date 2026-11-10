@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessions API | Endors Documentation</title>
+  <meta name="description" content="Create collection links and pre-call pages from code with the Endors Sessions API — lifecycle, dedupe, idempotency and session webhooks.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/documentation/docs.css">
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("endors-docs-theme"); } catch (e) {}
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="docs-layout">
+
+    <!-- ============ Sidebar ============ -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-header">
+        <a class="sidebar-logo" href="/documentation/">endors</a>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" placeholder="Search docs" aria-label="Search docs">
+          <kbd>/</kbd>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Documentation">
+        <div class="nav-section">
+          <p class="nav-section-title">Getting started</p>
+          <a class="nav-item" href="/documentation/">Introduction</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">API reference</p>
+          <a class="nav-item" href="/documentation/api/reference">API overview</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
+          <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
+          <a class="nav-item" href="/documentation/api/clients">Clients</a>
+          <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions" aria-current="page">Sessions</a>
+          <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
+          <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
+          <a class="nav-item" href="/documentation/api/search">AI search</a>
+          <a class="nav-item" href="/documentation/api/proof-match">Proof match</a>
+          <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
+          <a class="nav-item" href="/documentation/api/templates">Templates</a>
+          <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="footer-note">endors.io</span>
+        <button class="theme-toggle" type="button" aria-label="Toggle color theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ============ Mobile topbar ============ -->
+    <header class="docs-topbar">
+      <button class="sidebar-open-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="sidebar-logo" href="/documentation/">endors</a>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="docs-main">
+      <div class="docs-wrap">
+
+        <article class="docs-content">
+
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="/documentation/">Docs</a>
+            <span class="sep">/</span>
+            <a href="/documentation/api/reference">API reference</a>
+            <span class="sep">/</span>
+            <span aria-current="page">Sessions</span>
+          </nav>
+
+          <h1>Sessions</h1>
+          <p class="page-lede">
+            Sessions are the API-native way to create the "ask" artifacts — a collection
+            link or a pre-call page — from code. A session wraps the underlying artifact
+            with a stable public id (<code>sess_…</code>), a lifecycle
+            (<code>pending</code> → <code>completed</code> / <code>cancelled</code> /
+            <code>expired</code>), dedupe, idempotency and webhooks, so your integration
+            can create an ask and reconcile what happened to it without scraping the
+            dashboard.
+          </p>
+
+          <h2 id="create-a-session">Create a session</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/sessions</code>
+            </div>
+            <div class="endpoint-body">
+              <p>Registers a new session — the <code>type</code> selects which engine fires.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">create-session.sh</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/sessions" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 8f3a2b1c-checkout-947" \
+  -d '{
+    "type": "collection",
+    "customerName": "Dana Lee",
+    "email": "dana@example.com",
+    "source": "Stripe Checkout",
+    "metadata": {"order_id": "ord_947"}
+  }'</code></pre>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>type</code></td>
+                  <td>string</td>
+                  <td><span class="chip chip--accent">required</span></td>
+                  <td><code>"collection"</code> (a collection link) or <code>"precall"</code> (a pre-call page).</td>
+                </tr>
+                <tr>
+                  <td><code>customerName</code></td>
+                  <td>string</td>
+                  <td>For <code>precall</code></td>
+                  <td>The customer's name.</td>
+                </tr>
+                <tr>
+                  <td><code>email</code></td>
+                  <td>string</td>
+                  <td>For <code>precall</code>; rec. otherwise</td>
+                  <td>The customer's email. <strong>Required for dedupe</strong> — without it, sessions never dedupe. Never emailed by Endors — delivery is yours.</td>
+                </tr>
+                <tr>
+                  <td><code>source</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Free-text attribution (e.g. <code>"Stripe Checkout"</code>). Normalized for dedupe.</td>
+                </tr>
+                <tr>
+                  <td><code>templateId</code></td>
+                  <td>string</td>
+                  <td>For <code>precall</code></td>
+                  <td>Pre-call template to use (omit for the space default).</td>
+                </tr>
+                <tr>
+                  <td><code>context</code></td>
+                  <td>string</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Free-text context for the customer, ≤ 2,000 chars.</td>
+                </tr>
+                <tr>
+                  <td><code>metadata</code></td>
+                  <td>object</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Free-form JSON, ≤ 8 KB, returned verbatim on <code>session.completed</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>force</code></td>
+                  <td>boolean</td>
+                  <td><span class="chip">optional</span></td>
+                  <td>Skip dedupe — always create a fresh session.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Response — <code>201 Created</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": true,
+  "data": {
+    "id": "sess_4Nd92kxQ7Tz1mA6vBc8rYt5w",
+    "url": "https://collect.endors.io/r/launch",
+    "status": "pending",
+    "expiresAt": "2026-12-08T16:00:00.000Z",
+    "type": "collection",
+    "testMode": false,
+    "createdAt": "2026-11-08T16:00:00.000Z",
+    "deduplicated": false
+  }
+}</code></pre>
+          </div>
+
+          <p>Send <code>url</code> to the customer as-is.</p>
+
+          <div class="callout callout--warning">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Endors never sends email on your behalf</span>
+              <p>For any session type, delivering the URL (your own email service, in-app
+              message, SMS…) is your integration's job. The <code>email</code> field exists
+              for <strong>dedupe</strong> (same email + template + source within 7 days →
+              the existing session returns) and <strong>webhook correlation</strong>
+              (<code>session.completed</code> / <code>session.opened</code> echo it
+              verbatim) — it is never an address we message. Keeping delivery on your side
+              means deliverability, branding and email compliance stay entirely in your
+              control.</p>
+            </div>
+          </div>
+
+          <div class="callout callout--warning">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Pre-call sessions draw AI credits</span>
+              <p><code>type: "precall"</code> meters <strong>2 AI credits</strong> per
+              session from the space's balance. An empty balance returns
+              <code>402 AI_CREDITS_EXHAUSTED</code> with a <code>paywall</code> payload —
+              retrying the same request cannot succeed until credits are topped up.
+              Details on the
+              <a href="/documentation/api/pre-call-pages">Pre-Call pages</a> page.</p>
+            </div>
+          </div>
+
+          <h3 id="deduplication">Deduplication</h3>
+          <p>
+            Within one Space, a session with the same normalized email + template + source
+            created within 7 days of the existing session returns <code>200</code> with the
+            <em>existing</em> session and <code>deduplicated: true</code> — no new artifact.
+            Email and source are lowercased/trimmed, so <code>"Stripe Checkout"</code> and
+            <code>"stripe-checkout"</code> dedupe together. A missing <code>email</code>
+            disables dedupe for that request. <code>force: true</code> skips dedupe
+            entirely (and never blocks later dedupe).
+          </p>
+
+          <h3 id="idempotency">Idempotency</h3>
+          <p>
+            Send an <code>Idempotency-Key</code> header to make creation safe against
+            double-clicks and network retries:
+          </p>
+          <ul>
+            <li><strong>Same key + same body</strong> after completion → the original
+            response is returned verbatim (the same status code and body as the first
+            response).</li>
+            <li><strong>Same key + different body</strong> → <code>409
+            IDEMPOTENCY_REPLAY_MISMATCH</code> — a caller bug; do not retry with this key.</li>
+            <li><strong>Same key while the first request is still in flight</strong> →
+            <code>409 IDEMPOTENCY_CONFLICT</code> — retryable; wait for
+            <code>Retry-After</code> seconds and send the same key and body again.</li>
+          </ul>
+          <p>Idempotency records are kept for 24 hours.</p>
+
+          <h3 id="test-mode">Test mode</h3>
+          <p>
+            A test-mode key (tick <strong>Test mode</strong> when creating a key in the
+            dashboard) partitions everything it touches: sessions it creates are flagged
+            <code>testMode: true</code>, skip precall credit drawdown, dedupe only within
+            test mode, and are invisible to live keys in <code>GET</code>. Webhooks still
+            fire, with <code>testMode: true</code> in the envelope. Test sessions are
+            purgeable in one click from the API sessions panel on your dashboard home; the
+            flag itself is fixed at creation — rotate the key to switch modes. See
+            <a href="/documentation/api/api-keys#test-mode-keys">API keys · Test-mode keys</a>.
+          </p>
+
+          <h2 id="list-sessions">List sessions</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--get">GET</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/sessions</code>
+            </div>
+            <div class="endpoint-body">
+              <p>Lists sessions, newest first, with keyset pagination.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/sessions?limit=50" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>limit</code></td>
+                  <td>integer</td>
+                  <td>Page size. Defaults to <code>50</code>, capped at <code>200</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>cursor</code></td>
+                  <td>string</td>
+                  <td>Keyset pagination — pass <code>nextCursor</code> from the previous page; never OFFSET.</td>
+                </tr>
+                <tr>
+                  <td><code>type</code></td>
+                  <td>string</td>
+                  <td><code>collection</code> | <code>precall</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>status</code></td>
+                  <td>string</td>
+                  <td><code>pending</code> | <code>completed</code> | <code>cancelled</code> | <code>expired</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>source</code></td>
+                  <td>string</td>
+                  <td>Exact match on the attribution string you sent at creation.</td>
+                </tr>
+                <tr>
+                  <td><code>createdAfter</code></td>
+                  <td>ISO 8601</td>
+                  <td>Sessions created after this timestamp.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": true,
+  "data": [
+    {
+      "id": "sess_4Nd92kxQ7Tz1mA6vBc8rYt5w",
+      "type": "collection",
+      "status": "pending",
+      "url": "https://collect.endors.io/r/launch",
+      "source": "quickstart",
+      "expiresAt": "2026-12-08T16:00:00.000Z",
+      "testMode": false,
+      "createdAt": "2026-11-08T16:00:00.000Z"
+    }
+  ],
+  "nextCursor": "eyJ2Ijoi…"
+}</code></pre>
+          </div>
+
+          <p>
+            <code>nextCursor</code> appears only when the page filled.
+            <code>url</code> is the session artifact's live public URL, so you can re-send
+            the same ask to sessions that never completed (the reminder workflow).
+            <code>openedAt</code> appears only once the customer has opened the artifact
+            (absent until then — the funnel is created → opened → completed). A live key
+            never sees test sessions and vice versa.
+          </p>
+
+          <h2 id="get-one-session">Get one session</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--get">GET</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/sessions/<span class="param">{sessionId}</span></code>
+            </div>
+            <div class="endpoint-body">
+              <p>The webhook-less fallback for polling status.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/sessions/sess_4Nd92kxQ7Tz1mA6vBc8rYt5w" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <p>
+            Response: <code>{ ok, data: { id, type, status, url, source, expiresAt,
+            testMode, createdAt, openedAt? } }</code> — same row shape as the list.
+            <code>url</code> is the artifact's live public URL; <code>openedAt</code>
+            appears only once the customer opened it. A pending session past its
+            <code>expiresAt</code> reads as <code>"expired"</code> (sessions auto-expire
+            30 days after creation). <code>404 NOT_FOUND</code> for unknown or foreign ids.
+          </p>
+
+          <h2 id="cancel-a-session">Cancel a session</h2>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/sessions/<span class="param">{sessionId}</span>/cancel</code>
+            </div>
+            <div class="endpoint-body">
+              <p>Expires an unopened session early (wrong trigger, test accident).</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/sessions/sess_4Nd92kxQ7Tz1mA6vBc8rYt5w/cancel" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <p>
+            Only <code>pending</code> sessions cancel; anything else is <code>409
+            INVALID_STATE</code> (a second cancel is also 409, not a silent success).
+            Response: <code>200 { ok, data: { session: { …, status: "cancelled" } } }</code>.
+          </p>
+
+          <h2 id="session-webhooks">Session webhooks</h2>
+          <p>
+            Session-created artifacts fire the standard webhooks as the customer moves
+            through the ask — see
+            <a href="/documentation/api/webhooks#events">Supported events</a>. The host's
+            correlation id (<code>sessionId</code>) and the caller's <code>metadata</code>
+            come back on every event:
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Event</th><th>Fires when</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>session.opened</code></td><td>The customer opens the session's artifact (every open while pending).</td></tr>
+                <tr><td><code>submission.awaiting_approval</code></td><td>A collection-session submission lands in the Reviews queue.</td></tr>
+                <tr><td><code>session.completed</code></td><td>The session's artifact receives its final submission.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+
+          <!-- Previous / Next -->
+          <nav class="pager" aria-label="Pagination">
+            <a class="pager-link" href="/documentation/api/custom-fields">
+              <span class="pager-dir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+                Previous
+              </span>
+              <span class="pager-title">Custom fields</span>
+            </a>
+            <a class="pager-link pager-link--next" href="/documentation/api/assets">
+              <span class="pager-dir">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+              <span class="pager-title">Assets &amp; video</span>
+            </a>
+          </nav>
+
+          <footer class="docs-page-footer">
+            <span>Last updated Nov 2026</span>
+            <a href="/documentation/">Back to endors.io</a>
+          </footer>
+
+        </article>
+
+        <!-- ============ On this page ============ -->
+        <aside class="docs-toc">
+          <p class="toc-title">On this page</p>
+          <ul class="toc-list">
+            <li><a href="#create-a-session">Create a session</a></li>
+            <li><a href="#list-sessions">List sessions</a></li>
+            <li><a href="#get-one-session">Get one session</a></li>
+            <li><a href="#cancel-a-session">Cancel a session</a></li>
+            <li><a href="#session-webhooks">Session webhooks</a></li>
+          </ul>
+        </aside>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script src="/documentation/docs.js" defer></script>
+</body>
+</html>

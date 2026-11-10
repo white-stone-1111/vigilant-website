@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials" aria-current="page">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients">Clients</a>
           <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -137,7 +151,12 @@
                 <tr>
                   <td><code>limit</code></td>
                   <td>integer</td>
-                  <td>Max rows. Defaults to <code>200</code>, capped at <code>500</code>.</td>
+                  <td>Page size. Defaults to <code>200</code>, capped at <code>500</code>. Only meaningful together with <code>cursor</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>cursor</code></td>
+                  <td>string</td>
+                  <td>Opaque pagination cursor (see <a href="#pagination-optional">Pagination</a>).</td>
                 </tr>
                 <tr>
                   <td><code>folder_ids</code></td>
@@ -215,6 +234,43 @@
             Each row comes with client info and fully expanded media URLs — video
             embed/HLS/poster/player, image WebP transforms with <code>srcset</code>, and
             document public URLs. Video rows also carry any trim/poster-time overrides.
+          </p>
+
+          <h2 id="pagination-optional">Pagination (optional)</h2>
+          <p>
+            Purely additive — a request without <code>cursor</code> returns exactly the
+            same set it always did, with no <code>nextCursor</code>. Pass
+            <code>limit</code> with <code>cursor</code> to page:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">page.sh</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash"># first page
+curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"
+
+# → { "ok": true, "data": [ … 100 rows … ], "nextCursor": "eyJ2Ijoi…" }
+
+# next page — echo the cursor back
+curl "https://app.endors.io/api/spaces/$SPACE_ID/testimonials?limit=100&amp;cursor=eyJ2Ijoi…" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <p>
+            <code>nextCursor</code> appears only when the page filled. Keep passing the
+            latest value until a response omits it — that's the last page. Pagination
+            uses keyset semantics on <code>(source_created_at, id)</code>, so pages are
+            stable even while new testimonials are being created — you never see a row
+            twice or skip one. The cursor is opaque: treat it as a string, don't parse
+            or construct it. Malformed input returns <code>400 INVALID_LIMIT</code> or
+            <code>400 INVALID_CURSOR</code> with a <code>field</code> naming the
+            offending parameter.
           </p>
 
           <h2 id="create-testimonial">Create a testimonial</h2>
@@ -460,12 +516,12 @@
 
           <!-- Previous / Next -->
           <nav class="pager" aria-label="Pagination">
-            <a class="pager-link" href="/documentation/api/reference">
+            <a class="pager-link" href="/documentation/api/api-keys">
               <span class="pager-dir">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
                 Previous
               </span>
-              <span class="pager-title">API overview</span>
+              <span class="pager-title">API keys</span>
             </a>
             <a class="pager-link pager-link--next" href="/documentation/api/clients">
               <span class="pager-dir">
@@ -477,7 +533,7 @@
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -488,6 +544,7 @@
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
             <li><a href="#list-testimonials">List testimonials</a></li>
+            <li><a href="#pagination-optional">Pagination (optional)</a></li>
             <li><a href="#create-testimonial">Create a testimonial</a></li>
             <li><a href="#get-testimonial">Retrieve a testimonial</a></li>
             <li><a href="#update-testimonial">Update a testimonial</a></li>

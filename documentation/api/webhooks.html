@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Webhooks | Endors Documentation</title>
-  <meta name="description" content="Endors webhooks — seven event types, HMAC-SHA256 signature verification, retry behavior and delivery inspection.">
+  <meta name="description" content="Endors webhooks — ten event types, signature verification (v1 + legacy overlap), delivery history with filters, retry behavior and test events.">
   <link rel="icon" type="image/png" href="/assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients">Clients</a>
           <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks" aria-current="page">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -94,13 +108,97 @@
 
           <h1>Webhooks</h1>
           <p class="page-lede">
-            Webhooks push events to your backend as things happen in the space. Manage
-            them in the dashboard under <strong>Settings → API &amp; Webhooks</strong>
-            (creating and editing is session-only); a key can read the current
-            configuration and delivery history.
+            Outbound webhooks push real-time HTTP notifications to your server when
+            events happen in the Space — a submission is approved, a testimonial is
+            created, a session completes. Manage them in the dashboard under
+            <strong>Settings → API &amp; Webhooks</strong> (creating and editing is
+            session-only); a key can read the configuration and delivery history, and
+            create, update or delete endpoints.
           </p>
 
-          <h2 id="reading">Reading configuration</h2>
+          <h2 id="create-a-webhook">Create a webhook</h2>
+          <p>Register a new webhook endpoint for your Space. Requires a Bearer API key.</p>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--post">POST</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/webhooks</code>
+            </div>
+            <div class="endpoint-body">
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">bash</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-bash">curl -X POST "https://app.endors.io/api/spaces/$SPACE_ID/webhooks" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Production webhook",
+    "url": "https://your-server.com/webhooks/endors",
+    "events": ["submission.accepted", "testimonial.created"],
+    "secret": "your-signing-secret-at-least-16-chars"
+  }'</code></pre>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>url</code></td><td>string (URL)</td><td>Yes</td><td>The endpoint Endors will POST to.</td></tr>
+                    <tr><td><code>events</code></td><td>string[]</td><td>Yes</td><td>One or more event types to subscribe to (see <a href="#events">Events</a>).</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>No</td><td>A label for this webhook; defaults to <code>"My Webhook"</code>.</td></tr>
+                    <tr><td><code>secret</code></td><td>string</td><td>Recommended</td><td>Used to sign payloads (HMAC-SHA256); auto-generated if omitted.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>Passing an unsupported event name returns <code>400 BAD_REQUEST</code>.</p>
+
+              <div class="req-res">
+                <p class="req-res-title">Response — <code>201 Created</code></p>
+                <div class="code-block">
+                  <div class="code-block-header">
+                    <span class="code-lang">json</span>
+                    <button class="copy-btn" type="button" data-copy>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                      <span>Copy</span>
+                    </button>
+                  </div>
+                  <pre><code class="language-json">{
+  "ok": true,
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440040",
+    "name": "Production webhook",
+    "url": "https://your-server.com/webhooks/endors",
+    "events": ["submission.accepted", "testimonial.created"],
+    "active": true,
+    "created_at": "2025-04-19T16:00:00Z"
+  }
+}</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout--warning">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">The secret is never returned</span>
+              <p>The response does not include <code>secret</code>. If you let Endors
+              auto-generate one, copy it from the dashboard UI immediately after
+              creation — or set your own value in the request body.</p>
+            </div>
+          </div>
+
+          <h2 id="manage-webhooks">List, update &amp; delete webhooks</h2>
 
           <div class="endpoint">
             <div class="endpoint-head">
@@ -108,26 +206,175 @@
               <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/webhooks</code>
             </div>
             <div class="endpoint-body">
+              <p>Lists webhooks: <code>{ ok, data: [ { id, name, url, events, active, created_at } ] }</code>.</p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">bash</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="endpoint">
+            <div class="endpoint-head">
+              <span class="method method--patch">PATCH</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/webhooks/<span class="param">{webhookId}</span></code>
+            </div>
+            <div class="endpoint-body">
               <p>
-                Lists webhooks: <code>{ ok, data: [ { id, name, url, events, active,
-                created_at } ] }</code>. The signing secret is never returned.
+                Update a webhook's name, URL, subscribed events, or active status —
+                updatable fields are <code>name</code>, <code>url</code>,
+                <code>events</code>, <code>active</code>. Validation matches creation:
+                <code>url</code> must pass the public-HTTPS URL check, and
+                <code>events</code> must be a non-empty list of supported event types
+                (an unknown event name returns <code>400 BAD_REQUEST</code>).
+              </p>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <span class="code-lang">bash</span>
+                  <button class="copy-btn" type="button" data-copy>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <pre><code class="language-bash">curl -X PATCH "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID" \
+  -H "Authorization: Bearer $ENDOR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"active": false}'</code></pre>
+              </div>
+              <p>
+                The response echoes the webhook object with the updated values (the
+                example above returns <code>"active": false</code>).
               </p>
             </div>
           </div>
 
           <div class="endpoint">
             <div class="endpoint-head">
-              <span class="method method--get">GET</span>
-              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/webhooks/<span class="param">{webhookId}</span>/deliveries</code>
+              <span class="method method--delete">DELETE</span>
+              <code class="endpoint-path">/api/spaces/<span class="param">{spaceId}</span>/webhooks/<span class="param">{webhookId}</span></code>
             </div>
             <div class="endpoint-body">
               <p>
-                The 20 most recent delivery attempts for a webhook: <code>event</code>,
-                <code>status</code>, <code>attempt_count</code>,
-                <code>response_status</code>, <code>delivered_at</code>.
+                Returns <code>{ "ok": true }</code>. The endpoint is immediately
+                deregistered — no further events will be sent to it.
               </p>
             </div>
           </div>
+
+          <h2 id="deliveries">Delivery history</h2>
+          <p>
+            Every webhook event that Endors attempted to send is logged as a
+            <strong>delivery</strong>. Returns the 20 most recent deliveries for a
+            webhook. This log is queryable on purpose: if your endpoint goes down, poll
+            it to see exactly which events were attempted while you were offline, then
+            re-send the ones you want (<a href="#retries">retry is dashboard-only</a>;
+            the API returns the log either way). Delivery records are retained for your
+            webhook's lifetime — they are not deleted when you reconnect.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Param</th><th>Values</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>status</code></td><td><code>pending</code>, <code>success</code>, <code>failed</code>, <code>exhausted</code></td><td>Only return deliveries in this state. Invalid values return <code>400</code>.</td></tr>
+                <tr><td><code>event</code></td><td>a supported event name (e.g. <code>session.completed</code>)</td><td>Only return deliveries of this event type.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">deliveries.sh</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash"># All recent deliveries
+curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID/deliveries" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"
+
+# Only deliveries that failed while your endpoint was down
+curl "https://app.endors.io/api/spaces/$SPACE_ID/webhooks/WEBHOOK_ID/deliveries?status=exhausted" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": true,
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440050",
+      "event": "submission.accepted",
+      "status": "success",
+      "attempt_count": 1,
+      "response_status": 200,
+      "response_body": null,
+      "created_at": "2025-04-15T14:30:00Z",
+      "delivered_at": "2025-04-15T14:30:01Z",
+      "last_attempted_at": "2025-04-15T14:30:01Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440051",
+      "event": "testimonial.created",
+      "status": "exhausted",
+      "attempt_count": 5,
+      "response_status": 500,
+      "response_body": "Internal Server Error: signature verification failed (legacy scheme)",
+      "created_at": "2025-04-14T09:00:00Z",
+      "delivered_at": null,
+      "last_attempted_at": "2025-04-14T09:03:34Z"
+    }
+  ]
+}</code></pre>
+          </div>
+
+          <p>
+            <code>response_body</code> is the first ~2000 characters of your endpoint's
+            last response body (or the network-error message). It is how you diagnose a
+            failing receiver without server logs — for example, if your verifier is
+            still on the legacy signature scheme, the failure shows up right here in
+            your own delivery history before the
+            <a href="#verifying">signature cutover</a>.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Status</th><th>Meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>pending</code></td><td>Delivery is queued or currently in flight.</td></tr>
+                <tr><td><code>success</code></td><td>Your endpoint returned a <code>2xx</code> response.</td></tr>
+                <tr><td><code>failed</code></td><td>Delivery failed on a manual retry attempt.</td></tr>
+                <tr><td><code>exhausted</code></td><td>All automatic retry attempts failed (5xx responses or network errors) or a 4xx was received (non-retriable).</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Manually retrying a single delivery (<code>POST
+            /webhooks/{webhookId}/deliveries/{deliveryId}/retry</code>) requires a
+            browser session — it does not accept a Bearer API key. It returns
+            <code>{ "ok": true, "status": "success" }</code> (or
+            <code>"failed"</code>).
+          </p>
 
           <h2 id="events">Events</h2>
 
@@ -137,52 +384,419 @@
                 <tr><th>Event</th><th>Fires when</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>submission.completed</code></td><td>A collection form submission finishes (after any multi-step loop).</td></tr>
-                <tr><td><code>submission.accepted</code></td><td>A submission is approved into the library.</td></tr>
-                <tr><td><code>submission.not_approved</code></td><td>A submission is rejected.</td></tr>
+                <tr><td><code>submission.completed</code></td><td>A visitor completes all steps of a collection link form and the submission is finalized.</td></tr>
+                <tr><td><code>submission.accepted</code></td><td>You approve a submission in the Reviews queue.</td></tr>
+                <tr><td><code>submission.not_approved</code></td><td>You reject a submission — it stays in your library but is marked not approved and is not publicly displayed.</td></tr>
                 <tr><td><code>testimonial.created</code></td><td>A testimonial lands in the library — via the collect form, an import, or the API.</td></tr>
                 <tr><td><code>embedding.created</code></td><td>A widget embedding is published.</td></tr>
                 <tr><td><code>client.created</code></td><td>A client is created, including auto-created submitters.</td></tr>
                 <tr><td><code>collection.link.opened</code></td><td>Someone opens a collection link.</td></tr>
+                <tr><td><code>session.opened</code></td><td>A visitor opens a link created through the Sessions API. Fires every time the page opens while the session is pending; dashboard-created links never fire it.</td></tr>
+                <tr><td><code>submission.awaiting_approval</code></td><td>A submission through a Sessions-API link lands in the Reviews queue. Only fires when the submission actually enters review — auto-approved submissions go straight to <code>session.completed</code>.</td></tr>
+                <tr><td><code>session.completed</code></td><td>A Sessions-API link's form is completed — the host's correlation round-trip.</td></tr>
               </tbody>
             </table>
           </div>
 
-          <h2 id="verifying">Verifying signatures</h2>
-          <p>
-            Every delivery is signed with your webhook's secret using HMAC-SHA256. The
-            signature arrives in the <code>X-Endors-Signature</code> and
-            <code>X-Webhook-Signature</code> headers (the latter as
-            <code>sha256=…</code>). Verify over the raw request body:
-          </p>
+          <h3>The payload envelope</h3>
+          <p>Every webhook POST body wraps the event data in a consistent envelope:</p>
 
           <div class="code-block">
             <div class="code-block-header">
-              <span class="code-lang">js</span>
+              <span class="code-lang">json</span>
               <button class="copy-btn" type="button" data-copy>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
                 <span>Copy</span>
               </button>
             </div>
-            <pre><code class="language-js">import crypto from "node:crypto";
-
-export function verifyEndorsSignature(rawBody, signature, secret) {
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  return crypto.timingSafeEqual(
-    Buffer.from(expected),
-    Buffer.from(signature.replace(/^sha256=/, ""), "hex")
-  );
+            <pre><code class="language-json">{
+  "id": "delivery-uuid",
+  "event": "event.name",
+  "spaceId": "space-uuid",
+  "timestamp": "2025-04-15T14:30:00Z",
+  "apiVersion": "v1",
+  // context fields (event-specific, spread at top level — see each event)
+  "data": { }
 }</code></pre>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>UUID</td><td>The unique delivery ID for this webhook send.</td></tr>
+                <tr><td><code>event</code></td><td>string</td><td>The event type.</td></tr>
+                <tr><td><code>spaceId</code></td><td>string</td><td>The Space this event originated from (camelCase).</td></tr>
+                <tr><td><code>timestamp</code></td><td>ISO 8601</td><td>When the event occurred (UTC).</td></tr>
+                <tr><td><code>apiVersion</code></td><td>string</td><td>Always <code>"v1"</code> for current payloads.</td></tr>
+                <tr><td><code>data</code></td><td>object</td><td>Event-specific payload fields.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Some events also include additional <strong>context fields</strong> spread
+            at the top level of the envelope (alongside <code>event</code>,
+            <code>spaceId</code>, …) — e.g. <code>collectionLinkId</code>,
+            <code>sessionId</code>, <code>source</code>, depending on the event.
+          </p>
+
+          <h3 id="sessioncompleted"><code>session.completed</code></h3>
+          <p>
+            Fires when the form of a Sessions-API link is completed and the submission
+            is finalized. The caller's <code>metadata</code>, <code>source</code>,
+            <code>email</code>, and <code>customerName</code> come back verbatim, so you
+            can correlate the completion with your own records (e.g. the Stripe
+            customer you fired the trigger from). <code>sessionId</code> and
+            <code>source</code> ride at the top level of the envelope and are also in
+            <code>data</code>:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "id": "550e8400-e29b-41d4-a716-446655440068",
+  "event": "session.completed",
+  "spaceId": "space-abc123",
+  "timestamp": "2025-04-19T14:05:00Z",
+  "apiVersion": "v1",
+  "sessionId": "sess_aBcDeFgH12345678901234",
+  "source": "stripe-checkout",
+  "data": {
+    "sessionId": "sess_aBcDeFgH12345678901234",
+    "type": "collection",
+    "email": "jane@acme.com",
+    "customerName": "Jane",
+    "source": "stripe-checkout",
+    "metadata": { "stripeCustomerId": "cus_882" },
+    "completedAt": "2025-04-19T14:05:00Z"
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout--note">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Test-mode sessions are flagged in the envelope</span>
+              <p>Sessions created with a <a href="/documentation/api/api-keys#test-mode-keys">test-mode
+              API key</a> fire these events with <code>"testMode": true</code> between
+              <code>apiVersion</code> and the context fields (the Stripe
+              <code>livemode</code> pattern). Live payloads never carry the field.</p>
+            </div>
+          </div>
+
+          <h2 id="verifying">Verifying signatures</h2>
+          <p>Every webhook POST request from Endors includes these signature headers:</p>
+          <ul>
+            <li><code>X-Endors-Timestamp</code> — Unix epoch <strong>seconds</strong> when Endors signed the delivery.</li>
+            <li><code>X-Endors-Signature-V1</code> — <code>v1=&lt;hex&gt;</code>; HMAC-SHA256 of
+            <code>&lt;timestamp&gt;.&lt;rawBody&gt;</code> (the timestamp header value, a literal
+            <code>.</code>, then the raw request body bytes), signed with your webhook secret.</li>
+            <li><code>X-Endors-Signature</code> — during the overlap window (until
+            <strong>2027-02-01</strong>): the legacy <code>sha256=&lt;hex&gt;</code> body-only
+            signature, identical to <code>X-Webhook-Signature</code>. From the cutover on: the
+            v1 signature (same value as <code>X-Endors-Signature-V1</code>).</li>
+            <li><code>X-Webhook-Signature</code> — legacy alias (see above; disappears at the cutover).</li>
+            <li><code>X-Delivery-Id</code> — the delivery UUID matching <code>payload.id</code>.</li>
+          </ul>
+
+          <h3>The v1 scheme (canonical)</h3>
+          <p>
+            The v1 signature covers the signing <strong>timestamp</strong> as well as
+            the body, so a captured delivery cannot be replayed later with a valid
+            signature. Verification has two independent steps, both required:
+          </p>
+          <ol>
+            <li><strong>Freshness check:</strong> parse <code>X-Endors-Timestamp</code> and
+            reject the delivery if it is more than <strong>±5 minutes</strong> (300
+            seconds, symmetric) from your server's current time. A stale timestamp means
+            a replay attempt (or a badly skewed clock — see the note below); either way,
+            do not process the payload.</li>
+            <li><strong>Signature check:</strong> compute
+            <code>HMAC-SHA256(secret, "&lt;X-Endors-Timestamp&gt;.&lt;rawBody&gt;")</code> and
+            compare it to the <code>v1=</code> value with a timing-safe comparison.</li>
+          </ol>
+          <p>
+            The timestamp you sign/verify is the <strong>header</strong> value (Unix
+            seconds), which is the same instant as the payload's ISO-8601
+            <code>timestamp</code> field — but only the header is part of the signature
+            input.
+          </p>
+
+          <div class="callout callout--warning">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Why your server clock matters</span>
+              <p>Verification happens on <em>your</em> server, so if your clock is skewed
+              more than 5 minutes, every real Endors delivery fails the freshness check
+              silently — your non-2xx responses look like outages to the retry policy,
+              and the delivery eventually exhausts. If you get "timestamp outside ±5 min
+              tolerance" style failures across the board, check NTP/clock sync first.</p>
+            </div>
+          </div>
+
+          <h3>Legacy scheme (time-boxed, ends 2027-02-01)</h3>
+          <p>
+            Until <strong>2027-02-01 00:00 UTC</strong>, every delivery also carries the
+            original scheme so existing verifiers keep working:
+            <code>X-Endors-Signature: sha256=&lt;hex&gt;</code> (and alias
+            <code>X-Webhook-Signature</code>, same value) = HMAC-SHA256 hex digest of the
+            raw body alone. This scheme does <strong>not</strong> cover the timestamp, so
+            it is vulnerable to indefinite replay — it exists only as a migration
+            window, not as a recommendation.
+          </p>
+          <p>
+            <strong>The cutover is a calendar cliff:</strong> after 2027-02-01 the legacy
+            headers stop being sent entirely. Verifiers that only implement the legacy
+            scheme will start failing verification on that date, visibly, in their own
+            delivery history. There is no receiver-side migration signal — if your
+            verifier expects <code>sha256=&lt;hex of body&gt;</code>, implement the v1
+            scheme above.
+          </p>
+          <p>
+            During the overlap window, recommended verifier behavior: if
+            <code>X-Endors-Signature-V1</code> is present, verify v1 (freshness +
+            signature); otherwise verify the legacy header. Do <strong>not</strong>
+            accept a delivery that fails both.
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">verify-webhook.js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">const crypto = require('crypto');
+
+const TOLERANCE_SECONDS = 300; // ±5 minutes, symmetric
+
+// Call this with the raw request body buffer, NOT the parsed JSON
+function verifyEndorsWebhook(rawBody, headers, secret, nowMs = Date.now()) {
+  const tsHeader = headers['x-endors-timestamp'];
+  const sigV1 = headers['x-endors-signature-v1'];
+
+  if (sigV1) {
+    // --- v1: freshness, then signature ---
+    const ts = parseInt(tsHeader, 10);
+    if (!Number.isFinite(ts)) return { ok: false, reason: 'missing or malformed timestamp' };
+
+    const age = Math.abs(Math.floor(nowMs / 1000) - ts);
+    if (age > TOLERANCE_SECONDS) {
+      return { ok: false, reason: 'timestamp outside ±5 min tolerance — check server clock sync' };
+    }
+
+    const expected = 'v1=' + crypto
+      .createHmac('sha256', secret)
+      .update(`${ts}.${rawBody}`)  // rawBody must be a Buffer or string, NOT a parsed object
+      .digest('hex');
+    if (!timingSafeEq(expected, sigV1)) return { ok: false, reason: 'signature mismatch' };
+    return { ok: true, scheme: 'v1' };
+  }
+
+  // --- legacy (until 2027-02-01): body-only signature ---
+  const legacy = headers['x-endors-signature'];
+  if (!legacy) return { ok: false, reason: 'no signature headers' };
+  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  if (!timingSafeEq(expected, legacy)) return { ok: false, reason: 'signature mismatch' };
+  return { ok: true, scheme: 'legacy' };
+}
+
+function timingSafeEq(a, b) {
+  const aBuf = Buffer.from(a, 'utf8');
+  const bBuf = Buffer.from(b, 'utf8');
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+// Express.js example
+app.post('/webhooks/endors', express.raw({ type: 'application/json' }), (req, res) => {
+  const result = verifyEndorsWebhook(req.body, req.headers, process.env.ENDORS_WEBHOOK_SECRET);
+
+  if (!result.ok) {
+    console.error('Webhook verification failed:', result.reason);
+    return res.status(401).send('Invalid signature');
+  }
+
+  const payload = JSON.parse(req.body);
+  console.log(`Verified webhook event (${result.scheme}):`, payload.event);
+
+  if (payload.event === 'submission.accepted') {
+    // ... your logic here
+  }
+
+  res.status(200).send('OK');
+});</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">verify_webhook.py</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-python">import hmac
+import hashlib
+import os
+import time
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+
+TOLERANCE_SECONDS = 300  # ±5 minutes, symmetric
+
+def verify_endors_webhook(raw_body: bytes, headers: dict, secret: str) -> tuple[bool, str]:
+    ts_header = headers.get('X-Endors-Timestamp')
+    sig_v1 = headers.get('X-Endors-Signature-V1')
+
+    if sig_v1:
+        # --- v1: freshness, then signature ---
+        try:
+            ts = int(ts_header)
+        except (TypeError, ValueError):
+            return False, 'missing or malformed timestamp'
+
+        if abs(int(time.time()) - ts) > TOLERANCE_SECONDS:
+            return False, 'timestamp outside ±5 min tolerance — check server clock sync'
+
+        expected = 'v1=' + hmac.new(
+            secret.encode('utf-8'),
+            f"{ts}.".encode('utf-8') + raw_body,
+            hashlib.sha256
+        ).hexdigest()
+        return hmac.compare_digest(expected, sig_v1), 'v1'
+
+    # --- legacy (until 2027-02-01): body-only signature ---
+    legacy = headers.get('X-Endors-Signature', '')
+    expected = 'sha256=' + hmac.new(
+        secret.encode('utf-8'),
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, legacy), 'legacy'
+
+@app.route('/webhooks/endors', methods=['POST'])
+def handle_webhook():
+    ok, reason = verify_endors_webhook(
+        request.get_data(),
+        request.headers,
+        os.environ['ENDORS_WEBHOOK_SECRET']
+    )
+    if not ok:
+        print(f'Webhook verification failed: {reason}')
+        abort(401, 'Invalid signature')
+
+    payload = request.get_json()
+    event = payload.get('event')
+    print(f'Verified event: {event}')
+
+    if event == 'submission.accepted':
+        # ... your logic here
+        pass
+
+    return 'OK', 200</code></pre>
+          </div>
+
+          <div class="callout callout--danger">
+            <span class="callout-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </span>
+            <div>
+              <span class="callout-title">Always verify over the raw body</span>
+              <p>Use the <strong>raw request body bytes</strong> for signature
+              verification, not the parsed JSON — parsing and re-serializing can change
+              whitespace/encoding and break the computed signature. The v1 HMAC input is
+              exactly <code>&lt;X-Endors-Timestamp value&gt;.&lt;raw body&gt;</code> — a
+              literal <code>.</code> separator, timestamp <strong>header</strong> (Unix
+              seconds), not the payload's ISO <code>timestamp</code> field. And honor
+              the ±5-minute freshness check: skipping it re-opens the replay window the
+              scheme exists to close.</p>
+            </div>
           </div>
 
           <h2 id="retries">Retries &amp; delivery</h2>
           <p>
-            Failed deliveries retry 5 times with exponential backoff. Inspect outcomes
-            via the deliveries endpoint; a failed or exhausted delivery can be
-            re-attempted from the dashboard.
+            Endors automatically retries failed deliveries using exponential backoff.
+            Retries only occur for 5xx responses and network errors — a 4xx response is
+            treated as a configuration error and immediately marks the delivery as
+            <code>exhausted</code>.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Attempt</th><th>Delay before this attempt</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1st try</td><td>Immediate</td></tr>
+                <tr><td>2nd try</td><td>2 seconds</td></tr>
+                <tr><td>3rd try</td><td>8 seconds</td></tr>
+                <tr><td>4th try</td><td>32 seconds</td></tr>
+                <tr><td>5th try</td><td>128 seconds (~2 min)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            After all 5 attempts fail, the delivery is marked <code>exhausted</code>.
+            You can still trigger a manual retry at any time from the webhook delivery
+            history in Settings → API &amp; Webhooks.
+          </p>
+
+          <h3>Responding to webhooks</h3>
+          <p>
+            Your endpoint must return an HTTP <code>2xx</code> status code within
+            <strong>10 seconds</strong>. If it does not respond in time, or returns a
+            non-2xx status, Endors marks the delivery as failed and schedules automatic
+            retries. Best practice:
+          </p>
+          <ol>
+            <li>Immediately return <code>200 OK</code>.</li>
+            <li>Queue the payload for async processing in your own job queue.</li>
+            <li>Process the event asynchronously.</li>
+          </ol>
+          <p>
+            This prevents long-running business logic from causing timeouts and failed
+            deliveries.
+          </p>
+
+          <h2 id="test-event">Send a test event</h2>
+          <p>
+            Next to every webhook in <strong>Settings → API &amp; Webhooks</strong> there
+            is a <strong>Send test</strong> button. It fires one sample delivery through
+            the real send path — same signing headers, same payload envelope, same
+            10-second timeout — and shows your endpoint's response status right in the
+            dashboard, so you can verify your receiver works before writing any
+            integration code. Test deliveries:
+          </p>
+          <ul>
+            <li>carry <code>testMode: true</code> in the payload (between
+            <code>apiVersion</code> and <code>data</code>) so your handler can branch on them;</li>
+            <li>use visibly fake sample ids (e.g. <code>test_sample_0123…</code>,
+            <code>sess_sample0123…</code>) — you can always tell test traffic from live
+            events by the values alone;</li>
+            <li>are <strong>not</strong> recorded in the delivery history — the log stays
+            real traffic only;</li>
+            <li>use the first event your webhook subscribes to.</li>
+          </ul>
+          <p>
+            Verify the signature exactly as you would for a live event — a receiver
+            verified against test events is verified against the real wire format.
           </p>
 
           <div class="callout callout--tip">
@@ -209,17 +823,17 @@ export function verifyEndorsSignature(rawBody, signature, secret) {
               </span>
               <span class="pager-title">Templates</span>
             </a>
-            <a class="pager-link pager-link--next" href="/documentation/">
+            <a class="pager-link pager-link--next" href="/documentation/api/changelog">
               <span class="pager-dir">
                 Next
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-              <span class="pager-title">Introduction</span>
+              <span class="pager-title">Changelog</span>
             </a>
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -229,10 +843,13 @@ export function verifyEndorsSignature(rawBody, signature, secret) {
         <aside class="docs-toc">
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
-            <li><a href="#reading">Reading configuration</a></li>
+            <li><a href="#create-a-webhook">Create a webhook</a></li>
+            <li><a href="#manage-webhooks">List, update &amp; delete webhooks</a></li>
+            <li><a href="#deliveries">Delivery history</a></li>
             <li><a href="#events">Events</a></li>
             <li><a href="#verifying">Verifying signatures</a></li>
             <li><a href="#retries">Retries &amp; delivery</a></li>
+            <li><a href="#test-event">Send a test event</a></li>
           </ul>
         </aside>
 

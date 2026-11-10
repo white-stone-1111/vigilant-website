@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference" aria-current="page">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients">Clients</a>
           <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -169,6 +183,24 @@
             </div>
           </div>
 
+          <h2 id="field-naming">Field naming conventions</h2>
+          <p>
+            Current Endors API payloads use <strong>camelCase</strong> for all field names
+            — for example, <code>testimonialId</code>, <code>clientId</code>,
+            <code>createdAt</code>, <code>spaceId</code>. Some <strong>older endpoint
+            responses still return snake_case</strong> fields inherited from the underlying
+            database (for example, <code>text_content</code>, <code>active_asset</code>,
+            <code>source_created_at</code>, <code>folder_ids</code>), and a few request
+            bodies accept snake_case parameters (for example, <code>text_content</code> on
+            testimonial create and <code>folder_ids=1</code> on list endpoints). Those
+            snake_case names are <strong>legacy</strong>: they are documented per-endpoint
+            exactly as the API returns them and will not be silently renamed — changing
+            them would break existing integrations. Any <strong>new</strong> field added to
+            any endpoint or webhook payload from now on is camelCase. Write your
+            integration against the field names shown in each endpoint's documentation, and
+            do not assume one convention across the whole API.
+          </p>
+
           <h2 id="authentication">Authentication</h2>
           <p>
             Send your secret API key as a Bearer token. Keys start with
@@ -266,16 +298,89 @@ const { ok, data } = await endors(
                 <tr><td>Testimonials</td><td>GET list · POST create · GET one · PATCH update</td><td><a href="/documentation/api/testimonials">Testimonials</a></td></tr>
                 <tr><td>Clients</td><td>GET list · POST create · GET a client's testimonials</td><td><a href="/documentation/api/clients">Clients</a></td></tr>
                 <tr><td>Folders</td><td>GET list · POST create</td><td><a href="/documentation/api/folders">Folders</a></td></tr>
+                <tr><td>Custom fields</td><td>GET list · POST create · DELETE one (confirm)</td><td><a href="/documentation/api/custom-fields">Custom fields</a></td></tr>
+                <tr><td>Sessions</td><td>POST create · GET list · GET one · POST cancel</td><td><a href="/documentation/api/sessions">Sessions</a></td></tr>
                 <tr><td>Assets &amp; video</td><td>POST upload · video create-upload / status</td><td><a href="/documentation/api/assets">Assets &amp; video</a></td></tr>
                 <tr><td>Collection links</td><td>GET list · POST create</td><td><a href="/documentation/api/collection-links">Collection links</a></td></tr>
                 <tr><td>AI search</td><td>POST search (keyword / AI, NDJSON or JSON)</td><td><a href="/documentation/api/search">AI search</a></td></tr>
                 <tr><td>Proof match</td><td>POST proof/match</td><td><a href="/documentation/api/proof-match">Proof match</a></td></tr>
                 <tr><td>Pre-Call pages</td><td>POST pre-call-pages/generate (NDJSON)</td><td><a href="/documentation/api/pre-call-pages">Pre-Call pages</a></td></tr>
                 <tr><td>Templates</td><td>GET library · GET one template</td><td><a href="/documentation/api/templates">Templates</a></td></tr>
-                <tr><td>Webhooks</td><td>GET webhooks · GET deliveries</td><td><a href="/documentation/api/webhooks">Webhooks</a></td></tr>
+                <tr><td>Webhooks</td><td>GET/POST/PATCH/DELETE webhooks · GET deliveries</td><td><a href="/documentation/api/webhooks">Webhooks</a></td></tr>
               </tbody>
             </table>
           </div>
+
+          <h2 id="rate-limits">Rate limits</h2>
+          <p>
+            API-key requests to Space-scoped endpoints
+            (<code>/api/spaces/{spaceId}/…</code>) are rate limited per key:
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Endpoints</th><th>Limit</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>All endpoints (default)</td><td>120 requests / minute</td></tr>
+                <tr><td>AI endpoints — <code>POST …/search</code>, <code>POST …/proof/match</code>, <code>POST …/pre-call-pages/generate</code></td><td>20 requests / minute</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Every response carries the standard headers so well-behaved clients can
+            self-throttle before hitting the limit:
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Header</th><th>Meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>X-RateLimit-Limit</code></td><td>The tier's per-minute limit for this request.</td></tr>
+                <tr><td><code>X-RateLimit-Remaining</code></td><td>Requests left in the current minute window.</td></tr>
+                <tr><td><code>X-RateLimit-Reset</code></td><td>Unix epoch seconds when the window resets.</td></tr>
+                <tr><td><code>X-Endors-Request-Id</code></td><td>A unique id for this request, on every response (including 429s). Include it verbatim when contacting support — it's the anchor we debug from.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Exceeding the limit returns <strong>429 RATE_LIMITED</strong> with
+            <code>error.retryAfter</code> (seconds), plus a standard
+            <code>Retry-After</code> header:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": false,
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded for your API key. Slow down and retry after the window resets.",
+    "retryAfter": 37
+  }
+}</code></pre>
+          </div>
+
+          <ul>
+            <li>The limit is <strong>per API key</strong>, not per Space — a Space with two
+            keys gets two independent allowances.</li>
+            <li>The window is a fixed 60-second bucket: the first request starts it, and it
+            resets (doesn't slide) 60 seconds later.</li>
+            <li>Session-authenticated dashboard traffic is not subject to these limits.</li>
+            <li>The public collection form and embed endpoints have their own separate
+            limits, unchanged.</li>
+          </ul>
 
           <h2 id="conventions">Conventions</h2>
           <ul>
@@ -291,6 +396,22 @@ const { ok, data } = await endors(
             <li><strong>Streaming endpoints.</strong> AI search and Pre-Call pages default
             to NDJSON streams; both accept a flag (or parameter) that returns the same
             content as one JSON body for API callers.</li>
+            <li><strong>Idempotency.</strong> Creation endpoints accept an
+            <code>Idempotency-Key</code> header: the same key + body returns the original
+            response verbatim; the same key with a different body is
+            <code>409 IDEMPOTENCY_REPLAY_MISMATCH</code>; a reused in-flight key is
+            <code>409 IDEMPOTENCY_CONFLICT</code> (retryable — wait for
+            <code>Retry-After</code>). Records are kept for 24 hours. See the
+            <a href="/documentation/api/sessions#idempotency">Sessions API</a> for the
+            worked example.</li>
+            <li><strong>Pagination.</strong> List endpoints support optional keyset
+            pagination: pass <code>limit</code> (positive integer, endpoint-capped) and
+            echo <code>nextCursor</code> back as <code>cursor</code> until a response omits
+            it. Cursor-less requests return the full list exactly as before. Malformed
+            input returns <code>400 INVALID_LIMIT</code> / <code>400 INVALID_CURSOR</code>
+            with <code>error.field</code> naming the offending parameter. See the
+            <a href="/documentation/api/clients#pagination-optional">Clients API</a> for the
+            worked example.</li>
             <li><strong>Webhooks.</strong> Everything created through the API fires the
             same webhooks as the dashboard, with <code>source: "api"</code> where
             relevant.</li>
@@ -308,20 +429,88 @@ const { ok, data } = await endors(
                 <tr><th>Status</th><th>Code</th><th>When it happens</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>400</code></td><td><code>BAD_REQUEST</code></td><td>Invalid JSON or a parameter failed validation — check <code>message</code>.</td></tr>
-                <tr><td><code>401</code></td><td><code>UNAUTHORIZED</code></td><td>Missing or invalid API key.</td></tr>
-                <tr><td><code>403</code></td><td><code>FORBIDDEN</code></td><td>Key doesn't belong to <code>{spaceId}</code>, or a session caller lacks the required role.</td></tr>
-                <tr><td><code>403</code></td><td><code>PLAN_LIMIT</code></td><td>A plan limit (testimonials, embeddings, links…) is exhausted.</td></tr>
-                <tr><td><code>403</code></td><td><code>PLAN_RESTRICTION</code></td><td>The feature (API access, custom fields, external redirects…) isn't on the plan.</td></tr>
-                <tr><td><code>403</code></td><td><code>SUBSCRIPTION_REQUIRED</code></td><td>The space has no active subscription for write operations.</td></tr>
-                <tr><td><code>403</code></td><td><code>SPACE_LOCKED</code></td><td>The space is write-locked (billing issue).</td></tr>
-                <tr><td><code>404</code></td><td><code>NOT_FOUND</code></td><td>The resource doesn't exist in this space.</td></tr>
-                <tr><td><code>404</code></td><td><code>CLIENT_NOT_FOUND</code> / <code>ASSET_NOT_FOUND</code> / <code>FOLDER_NOT_FOUND</code></td><td>The referenced id is unknown or belongs to another space.</td></tr>
-                <tr><td><code>413</code></td><td>—</td><td>File too large (50 MB media, 1 GB video).</td></tr>
-                <tr><td><code>415</code></td><td>—</td><td>Unsupported file type.</td></tr>
-                <tr><td><code>500</code></td><td><code>DB_ERROR</code></td><td>Something went wrong on our side. Safe to retry once.</td></tr>
+                <tr><td><code>400</code></td><td><code>BAD_REQUEST</code></td><td>Missing required parameters or invalid request body.</td></tr>
+                <tr><td><code>400</code></td><td><code>BAD_JSON</code></td><td>Request body is not valid JSON.</td></tr>
+                <tr><td><code>400</code></td><td><code>VALIDATION_ERROR</code></td><td>Payload failed structural validation (e.g. bulk import rows); <code>rowErrors[]</code> names each failing row.</td></tr>
+                <tr><td><code>400</code></td><td><code>LIMIT_REACHED</code></td><td>A per-space limit has been reached (e.g. max API keys).</td></tr>
+                <tr><td><code>400</code></td><td><code>CONFIRM_REQUIRED</code></td><td>A permanent operation (e.g. custom-field delete) was sent without its confirmation (<code>confirm=true</code>).</td></tr>
+                <tr><td><code>400</code></td><td><code>INVALID_LIMIT</code></td><td>A <code>limit</code> query parameter that isn't a positive integer (paginated list endpoints; <code>error.field</code> names the parameter).</td></tr>
+                <tr><td><code>400</code></td><td><code>INVALID_CURSOR</code></td><td>A <code>cursor</code> query parameter that isn't a valid Endors cursor (paginated list endpoints; <code>error.field</code> names the parameter).</td></tr>
+                <tr><td><code>401</code></td><td><code>UNAUTHORIZED</code></td><td>Missing, invalid, or revoked API key.</td></tr>
+                <tr><td><code>403</code></td><td><code>FORBIDDEN</code></td><td>API key does not belong to the requested Space.</td></tr>
+                <tr><td><code>404</code></td><td><code>NOT_FOUND</code></td><td>The requested resource does not exist (or belongs to another Space).</td></tr>
+                <tr><td><code>409</code></td><td><code>DUPLICATE_FIELD</code></td><td>A resource with that name already exists.</td></tr>
+                <tr><td><code>403</code></td><td><code>PLAN_RESTRICTION</code></td><td>The Space's plan does not include this feature (e.g. API access, custom fields, external redirects); response carries a <code>paywall</code> object.</td></tr>
+                <tr><td><code>403</code></td><td><code>PLAN_LIMIT</code></td><td>A plan resource limit is exhausted (e.g. testimonials, embeddings); response carries a <code>paywall</code> object naming the resource and limit.</td></tr>
+                <tr><td><code>403</code></td><td><code>SPACE_LOCKED</code></td><td>The Space is locked (e.g. billing issue) and rejects writes; response carries a <code>paywall</code> object.</td></tr>
+                <tr><td><code>403</code></td><td><code>SUBSCRIPTION_REQUIRED</code></td><td>An active subscription is required for this action; response carries a <code>paywall</code> object.</td></tr>
+                <tr><td><code>402</code></td><td><code>AI_CREDITS_EXHAUSTED</code></td><td>The Space is out of AI credits (AI endpoints). Retry with the same request CANNOT succeed — top up credits first; response carries a <code>paywall</code> object with <code>required</code>/<code>available</code>.</td></tr>
+                <tr><td><code>429</code></td><td><code>RATE_LIMITED</code></td><td>The API key exceeded its per-minute rate limit (see <a href="#rate-limits">rate limits</a>); wait <code>retryAfter</code> seconds and retry (<code>error.retryAfter</code> + <code>Retry-After</code> header).</td></tr>
+                <tr><td><code>409</code></td><td><code>IDEMPOTENCY_CONFLICT</code></td><td>An <code>Idempotency-Key</code> was reused while the original request is still in flight; retry shortly with the SAME key and body (<code>Retry-After</code> names the lease TTL).</td></tr>
+                <tr><td><code>409</code></td><td><code>IDEMPOTENCY_REPLAY_MISMATCH</code></td><td>An <code>Idempotency-Key</code> was replayed with a DIFFERENT request body — a caller bug; do not retry with this key (send a new key for a new request).</td></tr>
+                <tr><td><code>409</code></td><td><code>INVALID_STATE</code></td><td>The requested state transition is not valid from the resource's current state (e.g. cancelling an already-completed session).</td></tr>
+                <tr><td><code>500</code></td><td><code>DB_ERROR</code></td><td>Server-side database error; contact support.</td></tr>
+                <tr><td><code>404</code></td><td><code>CLIENT_NOT_FOUND</code></td><td>The referenced client does not exist in the Space.</td></tr>
+                <tr><td><code>404</code></td><td><code>ASSET_NOT_FOUND</code></td><td>The referenced asset does not exist in the Space.</td></tr>
+                <tr><td><code>404</code></td><td><code>FOLDER_NOT_FOUND</code></td><td>The referenced folder does not exist in the Space.</td></tr>
+                <tr><td><code>422</code></td><td><code>DELIVERY_FAILED</code></td><td>The delivery retry attempt failed (see the <a href="/documentation/api/webhooks#retries">webhook retry policy</a>).</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <p>
+            All <code>paywall</code>-carrying errors (<code>PLAN_RESTRICTION</code>,
+            <code>PLAN_LIMIT</code>, <code>SPACE_LOCKED</code>,
+            <code>SUBSCRIPTION_REQUIRED</code>, <code>AI_CREDITS_EXHAUSTED</code>) are part
+            of one paywall family: the response also includes a top-level
+            <code>paywall</code> object your integration can inspect for plan/credit state.
+            <code>AI_CREDITS_EXHAUSTED</code> is the only one at HTTP 402; the rest are 403.
+            <code>RATE_LIMITED</code> is the only retryable 4xx-family code — the
+            <a href="/documentation/sdk/sdk">SDK</a> (and any well-behaved integration)
+            should honor <code>retryAfter</code> and retry.
+          </p>
+
+          <h3 id="handling-errors">Handling errors in code</h3>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">// Node.js example
+const res = await fetch(`https://app.endors.io/api/spaces/${SPACE_ID}/testimonials`, {
+  headers: { Authorization: `Bearer ${API_KEY}` }
+});
+
+if (!res.ok) {
+  const { error } = await res.json();
+  console.error(`API error ${res.status}: ${error.code} — ${error.message}`);
+}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">python</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-python"># Python example
+import requests
+
+resp = requests.get(
+    f"https://app.endors.io/api/spaces/{SPACE_ID}/testimonials",
+    headers={"Authorization": f"Bearer {API_KEY}"}
+)
+
+if not resp.ok:
+    error = resp.json().get("error", {})
+    print(f"API error {resp.status_code}: {error.get('code')} — {error.get('message')}")
+    resp.raise_for_status()</code></pre>
           </div>
 
           <div class="callout callout--tip">
@@ -335,6 +524,104 @@ const { ok, data } = await endors(
               testimonial behind.</p>
             </div>
           </div>
+
+          <h2 id="smart-embed">Show proof on your website (frontend)</h2>
+          <p>
+            The REST API is for servers (<code>sk_live_</code> keys — never in browser
+            code). For websites, use the frontend package instead:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">npx endors init</code></pre>
+          </div>
+
+          <p>
+            The init command detects your project (Next.js, React, or plain HTML), asks
+            for your embedding id (from <strong>Embeds → your wall → Embed id</strong>
+            in the dashboard), installs <code>@endors/widgets</code>, and drops in a
+            working example component that mounts the wall:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">js</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-js">import { mount } from "@endors/widgets";
+
+mount(document.getElementById("wall"), { embedId: "your-embedding-id" });</code></pre>
+          </div>
+
+          <p>
+            The widget loads the same live embed document as the copy-paste snippet,
+            auto-resizes to the content, and updates automatically whenever you change
+            the wall in Endors. No API key in frontend code — embedding ids are public
+            by design.
+          </p>
+
+          <h3 id="smart-embed-matching">Smart embed — matched walls per visitor</h3>
+          <p>
+            One embed, many pages: pass a free-form <code>match</code> context and the
+            wall shows testimonials <strong>matched to that context</strong> at render
+            time instead of the curated list — no backend, no API key, no extra
+            round-trip. Endors' deterministic proof-matching engine runs server-side
+            when the embed document renders (no LLM interpretation, no credits, ~1s)
+            and picks the strongest matches from the workspace's
+            <strong>shareable</strong> testimonials, filtered to the embedding's
+            testimonial type. Nothing matches → the curated wall renders; the embed
+            never blanks the host page.
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-title">wall.tsx</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-ts">// After a form submit — the visitor's own words pick the proof:
+import { mount } from "@endors/widgets";
+
+mount(document.getElementById("wall"), {
+  embedId: "your-embedding-id",
+  match: formData.education + ", " + formData.previousWork,
+});</code></pre>
+          </div>
+
+          <p>Copy-paste snippet equivalent:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">html</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-text">&lt;div data-endors-embed-id="your-embedding-id"
+     data-endors-match="studied business at DCU, worked 5 years in retail"&gt;&lt;/div&gt;
+&lt;script src="https://app.endors.io/embed.js" async&gt;&lt;/script&gt;</code></pre>
+          </div>
+
+          <p>
+            For popups and dynamic UIs that know the context only at open time, use a
+            getter: <code>data-endors-match-getter="getVisitorContext"</code> (the named
+            global function is called at mount), and inject the container after page
+            load, then call <code>Endors.mountAll()</code> to mount it. Matched embeds
+            use a shorter CDN cache (60s vs 1h) since the document varies per visitor
+            context.
+          </p>
 
           <h2 id="getting-started-flow">A complete flow</h2>
           <p>
@@ -369,24 +656,24 @@ const { ok, data } = await endors(
 
           <!-- Previous / Next -->
           <nav class="pager" aria-label="Pagination">
-            <a class="pager-link" href="/documentation/">
+            <a class="pager-link" href="/documentation/guides/recipes">
               <span class="pager-dir">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
                 Previous
               </span>
-              <span class="pager-title">Introduction</span>
+              <span class="pager-title">Recipes</span>
             </a>
-            <a class="pager-link pager-link--next" href="/documentation/api/testimonials">
+            <a class="pager-link pager-link--next" href="/documentation/api/api-keys">
               <span class="pager-dir">
                 Next
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-              <span class="pager-title">Testimonials</span>
+              <span class="pager-title">API keys</span>
             </a>
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -397,10 +684,13 @@ const { ok, data } = await endors(
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
             <li><a href="#base-url">Base URL &amp; envelope</a></li>
+            <li><a href="#field-naming">Field naming conventions</a></li>
             <li><a href="#authentication">Authentication</a></li>
             <li><a href="#endpoint-index">Endpoint index</a></li>
+            <li><a href="#rate-limits">Rate limits</a></li>
             <li><a href="#conventions">Conventions</a></li>
             <li><a href="#errors">Errors</a></li>
+            <li><a href="#smart-embed">Show proof on your website (frontend)</a></li>
             <li><a href="#getting-started-flow">A complete flow</a></li>
           </ul>
         </aside>

@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients" aria-current="page">Clients</a>
           <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -109,8 +123,12 @@
             <div class="endpoint-body">
               <p>
                 Returns all non-deleted clients in the space with full profile and CRM
-                fields, including custom field values. No pagination — the entire list is
-                returned.
+                fields, including custom field values — by default ordered by
+                <code>created_at</code> descending (newest first). For large client
+                lists you can paginate with <code>limit</code> and <code>cursor</code>
+                (see <a href="#pagination-optional">Pagination</a>) — both parameters
+                are optional and purely additive: a request without them returns the
+                full list exactly as before.
               </p>
             </div>
           </div>
@@ -126,6 +144,69 @@
             <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients" \
   -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
           </div>
+
+          <h2 id="pagination-optional">Pagination (optional)</h2>
+          <p>
+            Pass <code>limit</code> (positive integer, capped at <code>500</code>) to
+            cap the page size:
+          </p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients?limit=100" \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <p>When the list filled the page, the response includes a <code>nextCursor</code> field:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-json">{
+  "ok": true,
+  "data": [ /* up to `limit` clients */ ],
+  "nextCursor": "eyJ2IjoiMjAyNS0wMi0xNFQwODowMDowMFoiLCJpZCI6IjU1MGU4NDAwLi4uIn0"
+}</code></pre>
+          </div>
+
+          <p>To fetch the next page, pass the <code>nextCursor</code> value back as <code>cursor</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" type="button" data-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre><code class="language-bash">curl "https://app.endors.io/api/spaces/$SPACE_ID/clients?limit=100&amp;cursor=eyJ2Ijoi..." \
+  -H "Authorization: Bearer $ENDOR_API_KEY"</code></pre>
+          </div>
+
+          <p>
+            Keep passing the latest <code>nextCursor</code> until a response omits it —
+            that's the last page. The cursor is opaque: treat it as a string, don't
+            parse or construct it. Pagination uses keyset semantics on
+            <code>(created_at, id)</code>, so pages are stable even while new clients
+            are being created — you never see a row twice or skip one.
+          </p>
+          <p>
+            Malformed pagination input returns <code>400 INVALID_LIMIT</code> (for a
+            non-positive-integer <code>limit</code>) or <code>400 INVALID_CURSOR</code>
+            (for a cursor that isn't a valid Endors cursor), with a <code>field</code>
+            naming the offending parameter.
+          </p>
 
           <h2 id="create-client">Create a client</h2>
 
@@ -295,7 +376,7 @@
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -306,6 +387,7 @@
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
             <li><a href="#list-clients">List clients</a></li>
+            <li><a href="#pagination-optional">Pagination (optional)</a></li>
             <li><a href="#create-client">Create a client</a></li>
             <li><a href="#client-testimonials">List a client's testimonials</a></li>
           </ul>

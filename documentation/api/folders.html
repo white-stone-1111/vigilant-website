@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients">Clients</a>
           <a class="nav-item" href="/documentation/api/folders" aria-current="page">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -108,7 +122,11 @@
             </div>
             <div class="endpoint-body">
               <p>
-                Lists all folders in the space, alphabetical by name. No pagination.
+                Lists all folders in the space, sorted alphabetically by name. For
+                large folder lists you can paginate with the same optional
+                <code>limit</code>/<code>cursor</code> parameters as the clients
+                endpoint — a request without them returns the full list exactly as
+                before.
               </p>
               <p>Query parameters:</p>
               <div class="table-wrap">
@@ -167,6 +185,19 @@
               </div>
             </div>
           </div>
+
+          <h2 id="pagination-optional">Pagination (optional)</h2>
+          <p>
+            Identical mechanics to the
+            <a href="/documentation/api/clients#pagination-optional">Clients list</a>:
+            pass <code>limit</code> (capped at <code>200</code>) to get a
+            <code>nextCursor</code> when the set fills the page, then echo it back as
+            <code>cursor</code> until a response omits it. The keyset rides the list's
+            actual sort key — <code>(name, id)</code> ascending — so pages are stable
+            under inserts/deletes. The same <code>400 INVALID_LIMIT</code> /
+            <code>400 INVALID_CURSOR</code> errors apply (with <code>field</code>
+            naming the offending parameter).
+          </p>
 
           <h2 id="create-folder">Create a folder</h2>
 
@@ -239,17 +270,17 @@
               </span>
               <span class="pager-title">Clients</span>
             </a>
-            <a class="pager-link pager-link--next" href="/documentation/api/assets">
+            <a class="pager-link pager-link--next" href="/documentation/api/custom-fields">
               <span class="pager-dir">
                 Next
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </span>
-              <span class="pager-title">Assets &amp; video</span>
+              <span class="pager-title">Custom fields</span>
             </a>
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -260,6 +291,7 @@
           <p class="toc-title">On this page</p>
           <ul class="toc-list">
             <li><a href="#list-folders">List folders</a></li>
+            <li><a href="#pagination-optional">Pagination (optional)</a></li>
             <li><a href="#create-folder">Create a folder</a></li>
             <li><a href="#adding-testimonials">Adding testimonials to folders</a></li>
           </ul>

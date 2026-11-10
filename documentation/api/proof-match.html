@@ -41,13 +41,20 @@
         </div>
 
         <div class="nav-section">
+          <p class="nav-section-title">Developer guides</p>
+          <a class="nav-item" href="/documentation/guides/api-quickstart">API quickstart</a>
+          <a class="nav-item" href="/documentation/guides/recipes">Recipes</a>
+        </div>
+
+        <div class="nav-section">
           <p class="nav-section-title">API reference</p>
           <a class="nav-item" href="/documentation/api/reference">API overview</a>
-          <a class="nav-item" href="/documentation/api/reference#authentication">Authentication</a>
-          <a class="nav-item" href="/documentation/api/reference#errors">Errors</a>
+          <a class="nav-item" href="/documentation/api/api-keys">API keys</a>
           <a class="nav-item" href="/documentation/api/testimonials">Testimonials</a>
           <a class="nav-item" href="/documentation/api/clients">Clients</a>
           <a class="nav-item" href="/documentation/api/folders">Folders</a>
+          <a class="nav-item" href="/documentation/api/custom-fields">Custom fields</a>
+          <a class="nav-item" href="/documentation/api/sessions">Sessions</a>
           <a class="nav-item" href="/documentation/api/assets">Assets &amp; video</a>
           <a class="nav-item" href="/documentation/api/collection-links">Collection links</a>
           <a class="nav-item" href="/documentation/api/search">AI search</a>
@@ -55,6 +62,13 @@
           <a class="nav-item" href="/documentation/api/pre-call-pages">Pre-Call pages</a>
           <a class="nav-item" href="/documentation/api/templates">Templates</a>
           <a class="nav-item" href="/documentation/api/webhooks">Webhooks</a>
+          <a class="nav-item" href="/documentation/api/changelog">Changelog</a>
+        </div>
+
+        <div class="nav-section">
+          <p class="nav-section-title">SDK</p>
+          <a class="nav-item" href="/documentation/sdk/sdk">Node SDK</a>
+          <a class="nav-item" href="/documentation/sdk/widgets">Widgets &amp; CLI</a>
         </div>
 
       </nav>
@@ -98,6 +112,11 @@
             strongest relevant proof from the workspace with scored, grounded reasons —
             the same output as the dashboard's proof-match flow. Built for sales
             assistants and pre-call prep.
+          </p>
+
+          <p>
+            This is a metered AI endpoint: <strong>20 requests/minute per key</strong>
+            (see <a href="/documentation/api/reference#rate-limits">Rate limits</a>).
           </p>
 
           <div class="endpoint">
@@ -241,6 +260,14 @@
             names or pronouns.</li>
           </ul>
 
+          <h2 id="errors">Errors</h2>
+          <p>
+            <code>400</code> invalid/empty request · <code>401</code> unauthenticated ·
+            <code>403</code> not a member · <code>500</code> unexpected internal
+            failure. An empty <code>matches</code> array with <code>coverage</code> is
+            a successful response — design your fallback copy for it.
+          </p>
+
           <div class="callout callout--note">
             <span class="callout-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
@@ -274,7 +301,7 @@
           </nav>
 
           <footer class="docs-page-footer">
-            <span>Last updated Oct 2026</span>
+            <span>Last updated Nov 2026</span>
             <a href="/documentation/">Back to endors.io</a>
           </footer>
 
@@ -286,6 +313,7 @@
           <ul class="toc-list">
             <li><a href="#request-body">Request body</a></li>
             <li><a href="#matching-rules">Matching rules</a></li>
+            <li><a href="#errors">Errors</a></li>
           </ul>
         </aside>
 
